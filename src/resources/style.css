@@ -366,11 +366,11 @@ div.log {
   min-height: 50vh;
   width: 100%;
 }
-p.languages,
 p.small,
 p.offline-version,
 p.original-by,
 p.reverse-engineered-by,
+p.modified-by,
 p.source-code-on,
 p.release-date,
 p.update-history-on {
