@@ -366,11 +366,11 @@ div.log {
   min-height: 50vh;
   width: 100%;
 }
-p.languages,
 p.small,
 p.offline-version,
 p.original-by,
 p.reverse-engineered-by,
+p.modified-by,
 p.source-code-on,
 p.release-date,
 p.update-history-on {
@@ -998,4 +998,4 @@ input.toggle-switch:checked + label::before {
 }
 
 
-/*# sourceMappingURL=341.7479a20b49ae5f3be7b5.css.map*/
+/*# sourceMappingURL=341.bf28a9daa5bdb35e00e0.css.map*/
