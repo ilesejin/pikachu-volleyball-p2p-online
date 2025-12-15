@@ -70,7 +70,7 @@ import {
 } from '../quick_match/quick_match.js';
 import { replaySaver } from '../replay/replay_saver.js';
 
-/** @typedef {{speed: string, winningScore: number}} Options */
+/** @typedef {{speed: string, winningScore: number, rule: string}} Options */
 
 const firebaseApp = initializeApp(firebaseConfig);
 
@@ -506,10 +506,11 @@ function receiveChatMessageFromPeer(chatMessage) {
  *
  * speed: one of 'slow', 'medium', 'fast', null
  * winningScore: one of 5, 10, 15, null
+ * rule: one of 'Pgo', 'noserve'
  * @param {Options} options
  */
 export function sendOptionsChangeMessageToPeer(options) {
-  if (!options.speed && !options.winningScore) {
+  if (!options.speed && !options.winningScore && !options.rule) {
     return;
   }
   let optionsChangeMessageToPeer = JSON.stringify(options);

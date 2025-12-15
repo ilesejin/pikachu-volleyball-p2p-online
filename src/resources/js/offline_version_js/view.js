@@ -939,14 +939,16 @@ function makeScoreBoardSprite(textures) {
 function makeDownServeBoardSprite(textures) {
   const getNumberTexture = (n) => textures[TEXTURES.NEW_NUMBER(n)];
   const numberTextureArray = [];
+  const numberAnimatedSprites = [null, null];
+  const downServeBoard = new Container();
   for (let i = 0; i < 10; i++) {
     numberTextureArray.push(getNumberTexture(i));
   }
-  const numberAnimatedSprites = [null, null];
+  
   numberAnimatedSprites[0] = new AnimatedSprite(numberTextureArray, false);
   numberAnimatedSprites[1] = new AnimatedSprite(numberTextureArray, false);
 
-  const downServeBoard = new Container();
+  
   addChildToParentAndSetLocalPosition(
     downServeBoard,
     numberAnimatedSprites[0],

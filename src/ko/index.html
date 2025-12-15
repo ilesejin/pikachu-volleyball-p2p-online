@@ -196,7 +196,7 @@
             >
           </div>
           <div class="margin-top-a-little">
-            <input id="auto-save-replay-checkbox" type="checkbox" />
+            <input id="auto-save-replay-checkbox" type="checkbox" checked/>
             <label for="auto-save-replay-checkbox"
               >리플레이 자동 저장 (상대방과의 연결을 마칠 때 리플레이 파일을
               자동으로 저장합니다. 크롬, 파이어폭스 브라우저에서 정상 작동을
@@ -541,7 +541,7 @@
       <div id="connection-failed" class="hidden">연결에 실패했습니다.</div>
       <div id="replay-viewer-at" class="hidden">
         리플레이 재생기 주소:
-        https://gorisanson.github.io/pikachu-volleyball-p2p-online/ko/replay/
+        https://ilesejin.github.io/pikachu-volleyball-p2p-online/ko/replay/
       </div>
       <div id="copy" class="hidden">복사</div>
       <div id="copied" class="hidden">
@@ -801,6 +801,23 @@
                   </button>
                 </div>
               </div>
+              <div class="relative-container">
+                <button
+                  type="button"
+                  id="rule-submenu-btn"
+                  class="btn submenu-btn"
+                >
+                  룰 &#9654;&#xfe0e;
+                </button>
+                <div id="rule-submenu" class="submenu">
+                  <button type="button" id="Pgo-rule-btn" class="btn selected">
+                    <span class="check">&check; </span>Pgo 룰
+                  </button>
+                  <button type="button" id="noserve-rule-btn" class="btn">
+                    <span class="check">&check; </span>노서브 룰
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="relative-container">
@@ -1004,6 +1021,22 @@
           <button
             type="button"
             id="notice-winning-score-options-cannot-changed-if-game-in-progress-ok-btn"
+            class="btn-in-box key-y"
+          >
+            알겠어요 (Y)
+          </button>
+        </div>
+        <div
+          class="fade-in-box notice hidden"
+          id="notice-rule-options-cannot-changed-if-game-in-progress"
+        >
+          <p>
+            룰 설정은 경기가 진행 중에는 변경할 수 없습니다. 현재 진행
+            중인 경기가 끝난 후 다시 시도해주세요.
+          </p>
+          <button
+            type="button"
+            id="notice-rule-options-cannot-changed-if-game-in-progress-ok-btn"
             class="btn-in-box key-y"
           >
             알겠어요 (Y)

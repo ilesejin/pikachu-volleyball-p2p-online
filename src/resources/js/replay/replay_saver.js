@@ -5,7 +5,7 @@ import { convertUserInputTo5bitNumber } from '../utils/input_conversion.js';
 import { getCommentText } from './ui_replay.js';
 
 /** @typedef {import('../offline_version_js/physics.js').PikaUserInput} PikaUserInput */
-/** @typedef {{speed: string, winningScore: number}} Options options communicated with the peer */
+/** @typedef {{speed: string, winningScore: number, rule: string}} Options options communicated with the peer */
 
 /**
  * Class representing replay saver

@@ -269,6 +269,18 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
             break;
         }
       }
+      if (options[1].rule) {
+        switch (options[1].rule) {
+          case 'Pgo':
+            this.physics.modeNum = 1;
+            this.changeDownBoardVisibility(true);
+            break;
+          case 'noserve':
+            this.physics.modeNum = 2;
+            this.changeDownBoardVisibility(false);
+            break;
+        }
+      }
       this.optionsCounter++;
       options = this.options[this.optionsCounter];
     }
