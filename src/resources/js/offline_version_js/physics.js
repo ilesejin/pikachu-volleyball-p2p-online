@@ -544,6 +544,10 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
       ball.endByThunder = true; // If ended by thunder, the opposite player wins
     }
 
+    if (ball.y < MaximumYForThunder && ball.yVelocity > MinimumSpeedForThunder && ball.isServeState == true) {
+      ball.endByThunder = true; // If ended by thunder, the opposite player wins
+    }
+
     ball.yVelocity = -ball.yVelocity;
     ball.punchEffectX = ball.x;
     ball.y = BALL_TOUCHING_GROUND_Y_COORD;
@@ -661,8 +665,6 @@ function processPlayerMovementAndSetPlayerPosition(
 
   if (modeNum === 3 && ((!player.isPlayer2 && ball.dribbleCounts[0] > 2) || (player.isPlayer2 && ball.dribbleCounts[1] > 2))) {
     ball.canPowerhitBasedOnCollision = false;
-  } else {
-    ball.canPowerhitBasedOnCollision = true;
   }
   
   if (userInput.powerHit === 1) {
