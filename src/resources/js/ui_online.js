@@ -981,6 +981,10 @@ export function setUpUIAfterLoadingGameAssets(pikaVolley, ticker) {
           pikaVolley.physics.modeNum = 2;
           pikaVolley.changeDownBoardVisibility(false);
           break;
+        case 'DL36':
+          pikaVolley.physics.modeNum = 3;
+          pikaVolley.changeDownBoardVisibility(true);
+          break;
       }
     }
   };
@@ -1246,13 +1250,19 @@ function askOptionsChangeSendToPeer(options) {
     switch (options.rule) {
       case 'Pgo':
         optionsChangeBox.textContent += document
-          .getElementById('pgo-rule-btn')
+          .getElementById('Pgo-rule-btn')
           .textContent.replace('\u2713', '')
           .trim();
         break;
       case 'noserve':
         optionsChangeBox.textContent += document
           .getElementById('noserve-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'DL36':
+        optionsChangeBox.textContent += document
+          .getElementById('Down-Limit-36-rule-btn')
           .textContent.replace('\u2713', '')
           .trim();
         break;
@@ -1334,6 +1344,12 @@ export function askOptionsChangeReceivedFromPeer(options) {
       case 'noserve':
         optionsChangeBox.textContent += document
           .getElementById('noserve-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'DL36':
+        optionsChangeBox.textContent += document
+          .getElementById('Down-Limit-36-rule-btn')
           .textContent.replace('\u2713', '')
           .trim();
         break;
@@ -1655,6 +1671,7 @@ function setUpOptionsBtn() {
 
   const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
   const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+  const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
   const noticeBoxGameInProgressForRule = document.getElementById(
     'notice-rule-options-cannot-changed-if-game-in-progress'
   );
@@ -1682,6 +1699,17 @@ function setUpOptionsBtn() {
       return;
     }
     askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'noserve' });
+  });
+  DL36RuleBtn.addEventListener('click', () => {
+    if (DL36RuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'DL36' });
   });
   noticeBoxGameInProgressForRuleOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForRule.classList.contains('hidden')) {
@@ -1866,14 +1894,22 @@ function setSelectedOptionsBtn(options) {
   if (options.rule) {
     const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
     const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+    const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
     switch (options.rule) {
       case 'Pgo':
-        noserveRuleBtn.classList.remove('selected');
         PgoRuleBtn.classList.add('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.remove('selected');
         break;
       case 'noserve':
         PgoRuleBtn.classList.remove('selected');
         noserveRuleBtn.classList.add('selected');
+        DL36RuleBtn.classList.remove('selected');
+        break;
+      case 'DL36':
+        PgoRuleBtn.classList.remove('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.add('selected');
         break;
     }
   }
