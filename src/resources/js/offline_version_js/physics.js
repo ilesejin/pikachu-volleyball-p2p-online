@@ -265,6 +265,13 @@ class Ball {
     this.previousY = 0; // 0x60
     this.previousPreviousY = 0; // 0x64
 
+    
+    /** 
+     * Counting collision between ball and player without power hit
+     * @type {[number,number]}
+     *  */
+    this.dribbleCounts = [0,0];
+
     /**
      * Counting collision between ball and player without power hit
      * @type {[number,number]}
@@ -392,7 +399,7 @@ function physicsEngine(player1, player2, ball, userInputArray, modeNum = 1) {
             ball.canPowerhitBasedOnCollision = true;
           }
         }
-
+        
         if (modeNum != 3 || !(ball.dribbleCounts[i] > 4)) {
           processCollisionBetweenBallAndPlayer(
             ball,
@@ -544,14 +551,6 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
     // the omitted two functions maybe do a part of sound playback role.
     ball.sound.ballTouchesGround = true;
     ball.dribbleCounts = [0, 0];
-
-    if (
-      ball.y < MaximumYForThunder &&
-      ball.yVelocity > MinimumSpeedForThunder &&
-      ball.isServeState == true
-    ) {
-      ball.endByThunder = true; // If ended by thunder, the opposite player wins
-    }
 
     if (
       ball.y < MaximumYForThunder &&

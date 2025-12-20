@@ -1736,6 +1736,17 @@ function setUpOptionsBtn() {
       rule: 'DL36',
     });
   });
+  DL36RuleBtn.addEventListener('click', () => {
+    if (DL36RuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'DL36' });
+  });
   noticeBoxGameInProgressForRuleOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForRule.classList.contains('hidden')) {
       noticeBoxGameInProgressForRule.classList.add('hidden');
