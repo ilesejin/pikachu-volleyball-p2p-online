@@ -944,11 +944,10 @@ function makeDownServeBoardSprite(textures) {
   for (let i = 0; i < 10; i++) {
     numberTextureArray.push(getNumberTexture(i));
   }
-  
+
   numberAnimatedSprites[0] = new AnimatedSprite(numberTextureArray, false);
   numberAnimatedSprites[1] = new AnimatedSprite(numberTextureArray, false);
 
-  
   addChildToParentAndSetLocalPosition(
     downServeBoard,
     numberAnimatedSprites[0],
