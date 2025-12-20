@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pikachu Volleyball P2P Online</title>
+    <title>Pikachu Volleyball P2P Online for Competitions</title>
     <meta
       name="description"
       content="Play the game Pikachu Volleyball online via P2P (peer-to-peer) connection"
@@ -77,6 +77,12 @@
           <span class="no-wrap"
             ><a href="https://gorisanson.github.io/">Kyutae Lee</a></span
           >
+        </p>
+        <p class="modified-by">
+          <span class="no-wrap">This is pikachu-volleyball-p2p-online for Competitions helds at <a href="https://open.kakao.com/o/g0Cs478f">pikachu-volleyball online</a> <br />
+            The web version has been modified to conform to tournament rules. <br />
+            Modified by:
+          <span class="no-wrap"><a href="https://github.com/ilesejin">Exabyte</a></span>
         </p>
         <p class="source-code-on">
           You can view the source code on
@@ -852,6 +858,26 @@
                   </button>
                 </div>
               </div>
+              <div class="relative-container">
+                <button
+                  type="button"
+                  id="rule-submenu-btn"
+                  class="btn submenu-btn"
+                >
+                  Rules &#9654;&#xfe0e;
+                </button>
+                <div id="rule-submenu" class="submenu">
+                  <button type="button" id="Pgo-rule-btn" class="btn selected">
+                    <span class="check">&check; </span>Pgo rule
+                  </button>
+                  <button type="button" id="noserve-rule-btn" class="btn">
+                    <span class="check">&check; </span>No-serve rule
+                  </button>
+                  <button type="button" id="Down-Limit-36-rule-btn" class="btn">
+                    <span class="check">&check; </span>DL 3·6 rule
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="relative-container">
@@ -1066,6 +1092,21 @@
           <button
             type="button"
             id="notice-winning-score-options-cannot-changed-if-game-in-progress-ok-btn"
+            class="btn-in-box key-y"
+          >
+            OK (Y)
+          </button>
+        </div>
+        <div
+          class="fade-in-box notice hidden"
+          id="notice-rule-options-cannot-changed-if-game-in-progress"
+        >
+          <p>
+            Rule settings cannot be changed while a match is in progress. Please try again after the current match ends.
+          </p>
+          <button
+            type="button"
+            id="notice-rule-options-cannot-changed-if-game-in-progress-ok-btn"
             class="btn-in-box key-y"
           >
             OK (Y)

@@ -9,13 +9,12 @@ import {
 import { Cloud, Wave } from '../offline_version_js/cloud_and_wave.js';
 import { PikaPhysics } from '../offline_version_js/physics.js';
 import { convert5bitNumberToUserInput } from '../utils/input_conversion.js';
-import {
+import { noticeEndOfSpectation,
+  hideWaitingPeerAssetsStartBox,
   moveScrubberTo,
-  showKeyboardInputs,
+  showKeyboardInputs
 } from './ui_spectate.js';
-import { setTickerMaxFPSAccordingToNormalFPS } from '../spectate/spectate_player.js';
-import { noticeEndOfSpectation, hideWaitingPeerAssetsStartBox } from './ui_spectate.js';
-import { filterBadWords } from '../bad_words_censorship/chat_filter.js';
+import { setTickerMaxFPSAccordingToNormalFPS } from './spectate_player.js';
 
 /** @typedef GameState @type {function():void} */
 
@@ -160,8 +159,8 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
       hideWaitingPeerAssetsStartBox();
       this.selectedWithWho = 0;
       if (this.nicknames) {
-        displayNicknameFor(filterBadWords(this.nicknames[0]), this.isRoomCreatorPlayer2);
-        displayNicknameFor(filterBadWords(this.nicknames[1]), !this.isRoomCreatorPlayer2);
+        displayNicknameFor(this.nicknames[0], this.isRoomCreatorPlayer2);
+        displayNicknameFor(this.nicknames[1], !this.isRoomCreatorPlayer2);
       }
       if (this.partialPublicIPs) {
         displayPartialIPFor(
@@ -225,7 +224,6 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
     if (this.replayFrameCounter >= this.inputs.length) {
       return;
     }
-    
     moveScrubberTo(this.replayFrameCounter);
 
     const usersInputNumber = this.inputs[this.replayFrameCounter];
@@ -233,7 +231,6 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
       noticeEndOfSpectation();
       return;
     }
-    console.log(usersInputNumber);
     const player1Input = convert5bitNumberToUserInput(usersInputNumber >>> 5);
     const player2Input = convert5bitNumberToUserInput(
       usersInputNumber % (1 << 5)
@@ -275,6 +272,22 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
             break;
         }
       }
+      if (options[1].rule) {
+        switch (options[1].rule) {
+          case 'Pgo':
+            this.physics.modeNum = 1;
+            this.changeDownBoardVisibility(true);
+            break;
+          case 'noserve':
+            this.physics.modeNum = 2;
+            this.changeDownBoardVisibility(false);
+            break;
+          case 'DL36':
+            this.physics.modeNum = 3;
+            this.changeDownBoardVisibility(true);
+            break;
+        }
+      }
       this.optionsCounter++;
       options = this.options[this.optionsCounter];
     }
@@ -290,7 +303,7 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
     let chat = this.chats[this.chatCounter];
     while (chat && chat[0] === this.replayFrameCounter) {
       if (this.willDisplayChat) {
-        displayChatMessageAt(filterBadWords(chat[2]), chat[1]);
+        displayChatMessageAt(chat[2], chat[1]);
       }
       this.chatCounter++;
       chat = this.chats[this.chatCounter];

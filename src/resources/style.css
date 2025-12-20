@@ -1072,10 +1072,10 @@ input.toggle-switch:checked + label::before {
 .spectator-room-row {
   cursor: pointer;
   transition: background-color 0.2s;
-  background-color: #002e4d;
+  background-color: #0067ac;
 }
 .spectator-room-row:hover {
-  background-color: #0078ab;
+  background-color: #0094d3;
 }
 /*
 #spectator-room-list-content {

@@ -1,18 +1,13 @@
-"use strict";
-import { PikachuVolleyball } from "./offline_version_js/pikavolley.js";
-import { bufferLength, myKeyboard, OnlineKeyboard } from "./keyboard_online.js";
-import { SYNC_DIVISOR, channel } from "./data_channel/data_channel.js";
-import { mod } from "./utils/mod.js";
-import { askOneMoreGame } from "./ui_online.js";
-import {
-  displayPartialIPFor,
-  displayNicknameFor,
-  displayPeerNicknameFor,
-  displayMyAndPeerNicknameShownOrHidden,
-} from "./nickname_display.js";
-import { replaySaver } from "./replay/replay_saver.js";
-import { PikaUserInput } from "./offline_version_js/physics.js";
-import { displayMyAndPeerChatEnabledOrDisabled } from "./chat_display.js";
+'use strict';
+import { PikachuVolleyball } from './offline_version_js/pikavolley.js';
+import { bufferLength, myKeyboard, OnlineKeyboard } from './keyboard_online.js';
+import { SYNC_DIVISOR, channel } from './data_channel/data_channel';
+import { mod } from './utils/mod.js';
+import { askOneMoreGame } from './ui_online.js';
+import { displayPartialIPFor, displayNicknameFor } from './nickname_display.js';
+import { replaySaver } from './replay/replay_saver.js';
+import { PikaUserInput } from './offline_version_js/physics.js';
+import { displayMyAndPeerChatEnabledOrDisabled } from './chat_display.js';
 import { InputSaverForSpectator } from "./spectate/spectate_saver.js";
 
 /** @typedef GameState @type {function():void} */
@@ -44,7 +39,6 @@ export class PikachuVolleyballOnline extends PikachuVolleyball {
     this.isFirstGame = true;
 
     this.willSaveReplay = true;
-    this.hasSentGameOverSignal = false;
   }
 
   /**
@@ -104,11 +98,10 @@ export class PikachuVolleyballOnline extends PikachuVolleyball {
     if (this.selectedWithWho !== selectedWithWho) {
       this.amIPlayer2 = !this.amIPlayer2;
       displayNicknameFor(channel.myNickname, this.amIPlayer2);
-      displayPeerNicknameFor(channel.peerNickname, !this.amIPlayer2);
+      displayNicknameFor(channel.peerNickname, !this.amIPlayer2);
       displayPartialIPFor(channel.myPartialPublicIP, this.amIPlayer2);
       displayPartialIPFor(channel.peerPartialPublicIP, !this.amIPlayer2);
       displayMyAndPeerChatEnabledOrDisabled();
-      displayMyAndPeerNicknameShownOrHidden();
     }
   }
 
@@ -161,23 +154,19 @@ export class PikachuVolleyballOnline extends PikachuVolleyball {
       player2Input.yDirection = this.keyboardArray[1].yDirection;
       player2Input.powerHit = this.keyboardArray[1].powerHit;
       replaySaver.recordInputs(player1Input, player2Input);
-      if (channel.amICreatedRoom) { // 일단 작동하긴 하는데 더 나은 코드가 있을 듯 합니다...
-        if (this.slowMotionFramesLeft > 0) {
-          if (this.slowMotionNumOfSkippedFrames % Math.round(this.normalFPS / this.slowMotionFPS) !== 0) {
-            InputSaverForSpectator.recordInputs(player1Input, player2Input);
-          }
-        } else {
-          InputSaverForSpectator.recordInputs(player1Input, player2Input);
-        }
+      
+      if (channel.amICreatedRoom) {
+        InputSaverForSpectator.recordInputs(player1Input, player2Input);
       }
     }
-    
+
     // slow-mo effect
     if (this.slowMotionFramesLeft > 0) {
       this.slowMotionNumOfSkippedFrames++;
       if (
         this.slowMotionNumOfSkippedFrames %
-          Math.round(this.normalFPS / this.slowMotionFPS) !== 0
+          Math.round(this.normalFPS / this.slowMotionFPS) !==
+        0
       ) {
         return;
       }

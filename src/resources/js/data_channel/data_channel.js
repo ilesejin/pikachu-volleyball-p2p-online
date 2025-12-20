@@ -73,7 +73,7 @@ import {
 import { replaySaver } from '../replay/replay_saver.js';
 import { relayChannel } from '../spectate/relay_channel.js';
 
-/** @typedef {{speed: string, winningScore: number}} Options */
+/** @typedef {{speed: string, winningScore: number, rule: string}} Options */
 
 const firebaseApp = initializeApp(firebaseConfig);
 const RELAY_SERVER_URL = "wss://pikavolley-relay-server.onrender.com"; 
@@ -525,7 +525,7 @@ function receiveChatMessageFromPeer(chatMessage) {
  * @param {Options} options
  */
 export function sendOptionsChangeMessageToPeer(options) {
-  if (!options.speed && !options.winningScore) {
+  if (!options.speed && !options.winningScore && !options.rule) {
     return;
   }
   let optionsChangeMessageToPeer = JSON.stringify(options);

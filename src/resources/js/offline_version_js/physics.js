@@ -47,6 +47,10 @@ const BALL_TOUCHING_GROUND_Y_COORD = 252;
 const NET_PILLAR_HALF_WIDTH = 25;
 /** @constant @type {number} net pillar top's top side y coordinate */
 const NET_PILLAR_TOP_TOP_Y_COORD = 176;
+/** @constant @type {number} ball's y should be less than 212 for thunder */
+const MaximumYForThunder = 212;
+/** @constant @type {number} ball's y velocity should be larger than 42 for thunder */
+const MinimumSpeedForThunder = 42;
 /** @constant @type {number} net pillar top's bottom side y coordinate (this value is on this physics engine only) */
 const NET_PILLAR_TOP_BOTTOM_Y_COORD = 192;
 
@@ -77,6 +81,9 @@ export class PikaPhysics {
     this.player1 = new Player(false, isPlayer1Computer);
     this.player2 = new Player(true, isPlayer2Computer);
     this.ball = new Ball(false);
+
+    // Number of the rule
+    this.modeNum = 1;
   }
 
   /**
@@ -90,7 +97,8 @@ export class PikaPhysics {
       this.player1,
       this.player2,
       this.ball,
-      userInputArray
+      userInputArray,
+      this.modeNum
     );
     return isBallTouchingGround;
   }
@@ -232,6 +240,9 @@ class Ball {
     this.initializeForNewRound(isPlayer2Serve);
     /** @type {number} x coord of expected landing point */
     this.expectedLandingPointX = 0; // 0x40
+    /** @type {boolean} will the ball collide with the net? */
+    this.expectedNetCollision = false;
+
     /**
      * ball rotation frame number selector
      * During the period where it continues to be 5, hyper ball glitch occur.
@@ -254,6 +265,13 @@ class Ball {
     this.previousY = 0; // 0x60
     this.previousPreviousY = 0; // 0x64
 
+    
+    /** 
+     * Counting collision between ball and player without power hit
+     * @type {[number,number]}
+     *  */
+    this.dribbleCounts = [0,0];
+
     /**
      * this property is not in the ball pointer of the original source code.
      * But for sound effect (especially for stereo sound),
@@ -271,6 +289,20 @@ class Ball {
    * @param {boolean} isPlayer2Serve will player on the right side serve on this new round?
    */
   initializeForNewRound(isPlayer2Serve) {
+    /** @type {boolean} is Player2 serve? */
+    this.isPlayer2Serve = isPlayer2Serve;
+    /** @type {boolean} is the ball still in a serve state? */
+    this.isServeState = true;
+    /** @type {boolean} can the server powerhit the ball? */
+    this.canPowerhitBasedOnCollision = true;
+    /** @type {boolean} did the game end by down powerhitted serve? */
+    this.endByDownServe = false;
+    /** @type {boolean} did the game end by Thunder serve? */
+    this.endByThunder = false;
+    /** @type {boolean} was the down serve board updated? */
+    this.updatedDownServe = false;
+    /** @type {boolean} is the ball powerhitted down? */
+    this.isDownPowerhit = false;
     /** @type {number} x coord */
     this.x = 56; // 0x30    // initialized to 56 or 376
     if (isPlayer2Serve === true) {
@@ -286,6 +318,8 @@ class Ball {
     this.punchEffectRadius = 0; // 0x4c // initialized to 0
     /** @type {boolean} is power hit */
     this.isPowerHit = false; // 0x68  // initialized to 0 i.e. false
+    /** @type {[number,number]} */
+    this.dribbleCounts = [0,0]; // initialized to [0, 0]
   }
 }
 
@@ -300,7 +334,7 @@ class Ball {
  * @param {PikaUserInput[]} userInputArray userInputArray[0]: user input for player 1, userInputArray[1]: user input for player 2
  * @return {boolean} Is ball touching ground?
  */
-function physicsEngine(player1, player2, ball, userInputArray) {
+function physicsEngine(player1, player2, ball, userInputArray, modeNum = 1) {
   const isBallTouchingGround =
     processCollisionBetweenBallAndWorldAndSetBallPosition(ball);
 
@@ -326,7 +360,8 @@ function physicsEngine(player1, player2, ball, userInputArray) {
       player,
       userInputArray[i],
       theOtherPlayer,
-      ball
+      ball,
+      modeNum
     );
 
     // FUN_00402830 omitted
@@ -350,16 +385,42 @@ function physicsEngine(player1, player2, ball, userInputArray) {
     );
     if (isHappened === true) {
       if (player.isCollisionWithBallHappened === false) {
-        processCollisionBetweenBallAndPlayer(
-          ball,
-          player.x,
-          userInputArray[i],
-          player.state
-        );
-        player.isCollisionWithBallHappened = true;
+        // check if the ball is still in serve state
+        // when the ball touches the other player
+        if (+ball.isPlayer2Serve!=i && ball.isServeState) {
+          ball.isServeState = false;
+          if (modeNum == 2) {
+            ball.canPowerhitBasedOnCollision = true;
+          }
+        }
+        
+        if (modeNum != 3 || !(ball.dribbleCounts[i] > 4)) {
+          processCollisionBetweenBallAndPlayer(
+            ball,
+            player.x,
+            userInputArray[i],
+            player.state,
+            modeNum
+          );
+          player.isCollisionWithBallHappened = true;
+          if (ball.isServeState) {
+            if (modeNum == 2) {
+              ball.canPowerhitBasedOnCollision = false;
+            }
+          }
+        }
       }
     } else {
       player.isCollisionWithBallHappened = false;
+    }
+
+    if (modeNum == 1 || modeNum == 3) {
+    // did the serve end with a down hit?
+      if (ball.isDownPowerhit && ball.isServeState && !ball.expectedNetCollision &&
+        ((ball.expectedLandingPointX>=GROUND_HALF_WIDTH && !ball.isPlayer2Serve)
+        || (ball.expectedLandingPointX<GROUND_HALF_WIDTH && ball.isPlayer2Serve))) {
+        ball.endByDownServe = true;
+      }
     }
   }
 
@@ -395,6 +456,7 @@ function isCollisionBetweenBallAndPlayerHappened(ball, playerX, playerY) {
  * @param {Ball} ball
  * @return {boolean} Is ball touching ground?
  */
+
 function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
   // This is not part of this function in the original assembly code.
   // In the original assembly code, it is processed in other function (FUN_00402ee0)
@@ -419,7 +481,6 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
   }
   ball.fineRotation = futureFineRotation;
   ball.rotation = (ball.fineRotation / 10) | 0; // integer division
-
   const futureBallX = ball.x + ball.xVelocity;
   /*
     If the center of ball would get out of left world bound or right world bound, bounce back.
@@ -435,6 +496,7 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
   */
   if (futureBallX < BALL_RADIUS || futureBallX > GROUND_WIDTH) {
     ball.xVelocity = -ball.xVelocity;
+    ball.isDownPowerhit = false; // no more in a down powerhit state
   }
 
   let futureBallY = ball.y + ball.yVelocity;
@@ -444,6 +506,7 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
   }
 
   // If ball touches net
+  // serves going through the net doesn't change the down power hit state of the ball
   if (
     Math.abs(ball.x - GROUND_HALF_WIDTH) < NET_PILLAR_HALF_WIDTH &&
     ball.y > NET_PILLAR_TOP_TOP_Y_COORD
@@ -451,12 +514,17 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
     if (ball.y <= NET_PILLAR_TOP_BOTTOM_Y_COORD) {
       if (ball.yVelocity > 0) {
         ball.yVelocity = -ball.yVelocity;
+        ball.isDownPowerhit = false;
       }
     } else {
+      let prevVel = ball.xVelocity;
       if (ball.x < GROUND_HALF_WIDTH) {
         ball.xVelocity = -Math.abs(ball.xVelocity);
       } else {
         ball.xVelocity = Math.abs(ball.xVelocity);
+      }
+      if (ball.xVelocity * prevVel < 0) {
+        ball.isDownPowerhit = false;
       }
     }
   }
@@ -470,12 +538,27 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
     // code function (ballpointer + 0x28 + 0x10)? omitted
     // the omitted two functions maybe do a part of sound playback role.
     ball.sound.ballTouchesGround = true;
+    ball.dribbleCounts = [0,0];
+
+    if (ball.y < MaximumYForThunder && ball.yVelocity > MinimumSpeedForThunder && ball.isServeState == true) {
+      ball.endByThunder = true; // If ended by thunder, the opposite player wins
+    }
+
+    if (ball.y < MaximumYForThunder && ball.yVelocity > MinimumSpeedForThunder && ball.isServeState == true) {
+      ball.endByThunder = true; // If ended by thunder, the opposite player wins
+    }
 
     ball.yVelocity = -ball.yVelocity;
     ball.punchEffectX = ball.x;
     ball.y = BALL_TOUCHING_GROUND_Y_COORD;
     ball.punchEffectRadius = BALL_RADIUS;
     ball.punchEffectY = BALL_TOUCHING_GROUND_Y_COORD + BALL_RADIUS;
+    
+    // (deprecated) check if the game ended by down serve
+    // if (ball.isDownPowerhit && ball.isServeState) {
+    //   ball.endByDownServe = true;
+    // }
+
     return true;
   }
   ball.y = futureBallY;
@@ -493,11 +576,13 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
  * @param {Player} theOtherPlayer
  * @param {Ball} ball
  */
+
 function processPlayerMovementAndSetPlayerPosition(
   player,
   userInput,
   theOtherPlayer,
-  ball
+  ball,
+  modeNum = 1
 ) {
   if (player.isComputer === true) {
     letComputerDecideUserInput(player, ball, theOtherPlayer, userInput);
@@ -578,10 +663,20 @@ function processPlayerMovementAndSetPlayerPosition(
     }
   }
 
+  if (modeNum === 3 && ((!player.isPlayer2 && ball.dribbleCounts[0] > 2) || (player.isPlayer2 && ball.dribbleCounts[1] > 2))) {
+    ball.canPowerhitBasedOnCollision = false;
+  }
+  
   if (userInput.powerHit === 1) {
-    if (player.state === 1) {
+    // In noserve mode and serve state, the only the opposite player can powerhit
+    if (player.state === 1 && !(modeNum === 2 
+      && !ball.canPowerhitBasedOnCollision 
+      && (player.isPlayer2 === ball.isPlayer2Serve))
+      // if modeNum == 3 and
+      && (modeNum != 3 || ball.canPowerhitBasedOnCollision)) {
       // if player is jumping..
       // then player do power hit!
+      // Fixed an issue where 2p would not be powerhit immediately when 1p powerhit the ball
       player.delayBeforeNextFrame = 5;
       player.frameNumber = 0;
       player.state = 2;
@@ -679,9 +774,10 @@ function processCollisionBetweenBallAndPlayer(
   ball,
   playerX,
   userInput,
-  playerState
+  playerState,
+  modeNum
 ) {
-  // playerX is maybe pika's x position
+  // playerX is pika's x position
   // if collision occur,
   // greater the x position difference between pika and ball,
   // greater the x velocity of the ball.
@@ -705,6 +801,9 @@ function processCollisionBetweenBallAndPlayer(
     ball.yVelocity = -15;
   }
 
+  // ball is no more down powerhitted
+  ball.isDownPowerhit = false;
+
   // player is jumping and power hitting
   if (playerState === 2) {
     if (ball.x < GROUND_HALF_WIDTH) {
@@ -717,17 +816,33 @@ function processCollisionBetweenBallAndPlayer(
 
     ball.yVelocity = Math.abs(ball.yVelocity) * userInput.yDirection * 2;
     ball.punchEffectRadius = BALL_RADIUS;
+
+    // check if the ball is down powerhitted
+    if (userInput.yDirection==1) {
+      ball.isDownPowerhit = true;
+    }
+
     // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
     // refer to a detailed comment above about this function
     // maybe-soundcode function (ballpointer + 0x24 + 0x10) omitted:
     ball.sound.powerHit = true;
 
     ball.isPowerHit = true;
+    ball.dribbleCounts = [0,0];
   } else {
+    if (modeNum == 3) {
+      if (playerX < GROUND_HALF_WIDTH) { // for dribble-limit rules
+        ball.dribbleCounts[0] += 1;
+        ball.dribbleCounts[1] = 0;
+      } else {
+        ball.dribbleCounts[0] = 0;
+        ball.dribbleCounts[1] += 1;
+      }
+    }
     ball.isPowerHit = false;
   }
 
-  calculateExpectedLandingPointXFor(ball);
+  calculateExpectedLandingPointXFor(ball); 
 }
 
 /**
@@ -743,6 +858,7 @@ function calculateExpectedLandingPointXFor(ball) {
     yVelocity: ball.yVelocity,
   };
   let loopCounter = 0;
+  let netCollisoinFlag = false;
   while (true) {
     loopCounter++;
 
@@ -763,12 +879,17 @@ function calculateExpectedLandingPointXFor(ball) {
       if (copyBall.y < NET_PILLAR_TOP_BOTTOM_Y_COORD) {
         if (copyBall.yVelocity > 0) {
           copyBall.yVelocity = -copyBall.yVelocity;
+          netCollisoinFlag = true;
         }
       } else {
+        let prevVel = copyBall.xVelocity;
         if (copyBall.x < GROUND_HALF_WIDTH) {
           copyBall.xVelocity = -Math.abs(copyBall.xVelocity);
         } else {
           copyBall.xVelocity = Math.abs(copyBall.xVelocity);
+        }
+        if (copyBall.xVelocity * prevVel < 0) {
+          netCollisoinFlag = true;
         }
       }
     }
@@ -785,6 +906,7 @@ function calculateExpectedLandingPointXFor(ball) {
     copyBall.yVelocity += 1;
   }
   ball.expectedLandingPointX = copyBall.x;
+  ball.expectedNetCollision = netCollisoinFlag;
 }
 
 /**
