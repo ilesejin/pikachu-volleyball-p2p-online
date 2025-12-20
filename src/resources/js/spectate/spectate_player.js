@@ -12,7 +12,7 @@ import { CanvasSpriteRenderer } from '@pixi/canvas-sprite';
 import { CanvasPrepare } from '@pixi/canvas-prepare';
 import '@pixi/canvas-display';
 import { ASSETS_PATH } from '../offline_version_js/assets_path.js';
-import { PikachuVolleyballReplay } from './pikavolley_spectate.js'; 
+import { PikachuVolleyballReplay } from './pikavolley_spectate.js';
 import { setGetSpeechBubbleNeeded, hideChat } from '../chat_display.js';
 
 import {
@@ -24,12 +24,13 @@ import {
   hideNoticeEndOfSpectation,
   adjustFPSInputValue,
   moveScrubberTo,
-} from './ui_spectate.js'; 
+} from './ui_spectate.js';
 import '../../style.css';
 
-const SERVER_URL = "wss://pikavolley-relay-server.onrender.com";
+const SERVER_URL = 'wss://pikavolley-relay-server.onrender.com';
 
-class SpectatorPlayer { // ReplayPlayer -> SpectatorPlayer
+class SpectatorPlayer {
+  // ReplayPlayer -> SpectatorPlayer
   constructor() {
     Renderer.registerPlugin('prepare', Prepare);
     Renderer.registerPlugin('batch', BatchRenderer);
@@ -57,48 +58,50 @@ class SpectatorPlayer { // ReplayPlayer -> SpectatorPlayer
     this.playBackSpeedFPS = null;
     this.ws = null; // WebSocket
   }
-  
+
   startSpectating(roomId) {
-    if (this.ws) { 
+    if (this.ws) {
       return;
-    }    
+    }
     const connectUrl = `${SERVER_URL}/${roomId}`;
     this.ws = new WebSocket(connectUrl);
 
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify({ type: "watch" }));
+      this.ws.send(JSON.stringify({ type: 'watch' }));
     };
 
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        
-        if (data.type === "replay_pack") {
-          this.initialize(data.pack); 
-        } else if (data.type === "live_input") {
+
+        if (data.type === 'replay_pack') {
+          this.initialize(data.pack);
+        } else if (data.type === 'live_input') {
           this.pushInput(data.value);
-        } else if (data.type === "live_options") {
+        } else if (data.type === 'live_options') {
           this.pushOptions(data.value);
-        } else if (data.type === "live_chat") {
+        } else if (data.type === 'live_chat') {
           this.pushChat(data.value);
         }
       } catch (e) {
-        console.error("Failed to parse server message:", e);
+        console.error('Failed to parse server message:', e);
       }
     };
-    
-    this.ws.onclose = () => { 
-      console.log("WebSocket connection ended");
+
+    this.ws.onclose = () => {
+      console.log('WebSocket connection ended');
     };
-    this.ws.onerror = (err) => { 
-      console.error("WebSocket error:", err);
+    this.ws.onerror = (err) => {
+      console.error('WebSocket error:', err);
     };
   }
 
   initialize(pack) {
-    document.querySelector('#game-canvas-container').appendChild(this.renderer.view);
+    document
+      .querySelector('#game-canvas-container')
+      .appendChild(this.renderer.view);
     this.renderer.render(this.stage);
-    
+
     this.ticker.add(() => {
       this.renderer.render(this.stage);
       if (!this.pikaVolley) return;
@@ -114,59 +117,59 @@ class SpectatorPlayer { // ReplayPlayer -> SpectatorPlayer
     }
 
     this.loader.load(() => {
-        this.pikaVolley = new PikachuVolleyballReplay(
-          this.stage,
-          this.loader.resources,
-          pack.roomID,
-          pack.nicknames,
-          pack.partialPublicIPs,
-          pack.inputs,
-          pack.options,
-          pack.chats
-        );
-        //@ts-ignore
-        setGetSpeechBubbleNeeded(this.pikaVolley);
-        
-        this.seekFrame(pack.inputs.length); 
-        setMaxForScrubberRange(pack.inputs.length);
+      this.pikaVolley = new PikachuVolleyballReplay(
+        this.stage,
+        this.loader.resources,
+        pack.roomID,
+        pack.nicknames,
+        pack.partialPublicIPs,
+        pack.inputs,
+        pack.options,
+        pack.chats
+      );
+      //@ts-ignore
+      setGetSpeechBubbleNeeded(this.pikaVolley);
 
-        this.ticker.maxFPS = this.pikaVolley.normalFPS;
+      this.seekFrame(pack.inputs.length);
+      setMaxForScrubberRange(pack.inputs.length);
 
-        this.ticker.start();
-        adjustPlayPauseBtnIcon();
-        enableReplayScrubberAndBtns();
+      this.ticker.maxFPS = this.pikaVolley.normalFPS;
 
-        const loadingUI = document.getElementById('spectator-loading');
-        if (loadingUI) {
-          loadingUI.style.display = 'none';
-        }
-        const controlsUI = document.getElementById('replay-controls');
-        if (controlsUI) {
-          controlsUI.style.display = 'block';
-        }
+      this.ticker.start();
+      adjustPlayPauseBtnIcon();
+      enableReplayScrubberAndBtns();
+
+      const loadingUI = document.getElementById('spectator-loading');
+      if (loadingUI) {
+        loadingUI.style.display = 'none';
+      }
+      const controlsUI = document.getElementById('replay-controls');
+      if (controlsUI) {
+        controlsUI.style.display = 'block';
+      }
     });
   }
-  
+
   pushInput(usersInputNumber) {
-    if (!this.pikaVolley) { 
-      return; 
+    if (!this.pikaVolley) {
+      return;
     }
     this.pikaVolley.inputs.push(usersInputNumber);
     setMaxForScrubberRange(this.pikaVolley.inputs.length);
   }
 
   pushOptions(optionsData) {
-    if (!this.pikaVolley) { 
-      return; 
+    if (!this.pikaVolley) {
+      return;
     }
-    this.pikaVolley.options.push(optionsData); 
+    this.pikaVolley.options.push(optionsData);
   }
 
   pushChat(chatData) {
-    if (!this.pikaVolley) { 
-      return; 
+    if (!this.pikaVolley) {
+      return;
     }
-    this.pikaVolley.chats.push(chatData); 
+    this.pikaVolley.chats.push(chatData);
   }
 
   /**
@@ -264,7 +267,8 @@ export function setTickerMaxFPSAccordingToNormalFPS(normalFPS) {
   if (spectatorPlayer.playBackSpeedFPS) {
     spectatorPlayer.ticker.maxFPS = spectatorPlayer.playBackSpeedFPS;
   } else if (spectatorPlayer.playBackSpeedTimes) {
-    spectatorPlayer.ticker.maxFPS = normalFPS * spectatorPlayer.playBackSpeedTimes;
+    spectatorPlayer.ticker.maxFPS =
+      normalFPS * spectatorPlayer.playBackSpeedTimes;
   } else {
     spectatorPlayer.ticker.maxFPS = normalFPS;
   }

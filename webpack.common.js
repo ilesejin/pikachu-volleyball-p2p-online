@@ -15,8 +15,7 @@ module.exports = {
       './src/resources/js/offline_version_js/utils/dark_color_scheme.js',
     is_embedded_in_other_website:
       './src/resources/js/offline_version_js/utils/is_embedded_in_other_website.js',
-    spectator:
-      './src/resources/js/spectate/main_spectate.js',
+    spectator: './src/resources/js/spectate/main_spectate.js',
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -125,7 +124,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/en/spectator/index.html',
       filename: 'en/spectator/index.html',
-      chunks: ['runtime', 'spectator', 'dark_color_scheme'], 
+      chunks: ['runtime', 'spectator', 'dark_color_scheme'],
       chunksSortMode: 'manual',
       minify: {
         collapseWhitespace: true,
@@ -135,7 +134,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/ko/spectator/index.html',
       filename: 'ko/spectator/index.html',
-      chunks: ['runtime', 'ko', 'spectator', 'dark_color_scheme'], 
+      chunks: ['runtime', 'ko', 'spectator', 'dark_color_scheme'],
       chunksSortMode: 'manual',
       minify: {
         collapseWhitespace: true,

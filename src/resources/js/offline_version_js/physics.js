@@ -265,12 +265,11 @@ class Ball {
     this.previousY = 0; // 0x60
     this.previousPreviousY = 0; // 0x64
 
-    
-    /** 
+    /**
      * Counting collision between ball and player without power hit
      * @type {[number,number]}
      *  */
-    this.dribbleCounts = [0,0];
+    this.dribbleCounts = [0, 0];
 
     /**
      * this property is not in the ball pointer of the original source code.
@@ -319,7 +318,7 @@ class Ball {
     /** @type {boolean} is power hit */
     this.isPowerHit = false; // 0x68  // initialized to 0 i.e. false
     /** @type {[number,number]} */
-    this.dribbleCounts = [0,0]; // initialized to [0, 0]
+    this.dribbleCounts = [0, 0]; // initialized to [0, 0]
   }
 }
 
@@ -387,13 +386,13 @@ function physicsEngine(player1, player2, ball, userInputArray, modeNum = 1) {
       if (player.isCollisionWithBallHappened === false) {
         // check if the ball is still in serve state
         // when the ball touches the other player
-        if (+ball.isPlayer2Serve!=i && ball.isServeState) {
+        if (+ball.isPlayer2Serve != i && ball.isServeState) {
           ball.isServeState = false;
           if (modeNum == 2) {
             ball.canPowerhitBasedOnCollision = true;
           }
         }
-        
+
         if (modeNum != 3 || !(ball.dribbleCounts[i] > 4)) {
           processCollisionBetweenBallAndPlayer(
             ball,
@@ -415,10 +414,16 @@ function physicsEngine(player1, player2, ball, userInputArray, modeNum = 1) {
     }
 
     if (modeNum == 1 || modeNum == 3) {
-    // did the serve end with a down hit?
-      if (ball.isDownPowerhit && ball.isServeState && !ball.expectedNetCollision &&
-        ((ball.expectedLandingPointX>=GROUND_HALF_WIDTH && !ball.isPlayer2Serve)
-        || (ball.expectedLandingPointX<GROUND_HALF_WIDTH && ball.isPlayer2Serve))) {
+      // did the serve end with a down hit?
+      if (
+        ball.isDownPowerhit &&
+        ball.isServeState &&
+        !ball.expectedNetCollision &&
+        ((ball.expectedLandingPointX >= GROUND_HALF_WIDTH &&
+          !ball.isPlayer2Serve) ||
+          (ball.expectedLandingPointX < GROUND_HALF_WIDTH &&
+            ball.isPlayer2Serve))
+      ) {
         ball.endByDownServe = true;
       }
     }
@@ -538,13 +543,21 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
     // code function (ballpointer + 0x28 + 0x10)? omitted
     // the omitted two functions maybe do a part of sound playback role.
     ball.sound.ballTouchesGround = true;
-    ball.dribbleCounts = [0,0];
+    ball.dribbleCounts = [0, 0];
 
-    if (ball.y < MaximumYForThunder && ball.yVelocity > MinimumSpeedForThunder && ball.isServeState == true) {
+    if (
+      ball.y < MaximumYForThunder &&
+      ball.yVelocity > MinimumSpeedForThunder &&
+      ball.isServeState == true
+    ) {
       ball.endByThunder = true; // If ended by thunder, the opposite player wins
     }
 
-    if (ball.y < MaximumYForThunder && ball.yVelocity > MinimumSpeedForThunder && ball.isServeState == true) {
+    if (
+      ball.y < MaximumYForThunder &&
+      ball.yVelocity > MinimumSpeedForThunder &&
+      ball.isServeState == true
+    ) {
       ball.endByThunder = true; // If ended by thunder, the opposite player wins
     }
 
@@ -553,7 +566,7 @@ function processCollisionBetweenBallAndWorldAndSetBallPosition(ball) {
     ball.y = BALL_TOUCHING_GROUND_Y_COORD;
     ball.punchEffectRadius = BALL_RADIUS;
     ball.punchEffectY = BALL_TOUCHING_GROUND_Y_COORD + BALL_RADIUS;
-    
+
     // (deprecated) check if the game ended by down serve
     // if (ball.isDownPowerhit && ball.isServeState) {
     //   ball.endByDownServe = true;
@@ -663,17 +676,26 @@ function processPlayerMovementAndSetPlayerPosition(
     }
   }
 
-  if (modeNum === 3 && ((!player.isPlayer2 && ball.dribbleCounts[0] > 2) || (player.isPlayer2 && ball.dribbleCounts[1] > 2))) {
+  if (
+    modeNum === 3 &&
+    ((!player.isPlayer2 && ball.dribbleCounts[0] > 2) ||
+      (player.isPlayer2 && ball.dribbleCounts[1] > 2))
+  ) {
     ball.canPowerhitBasedOnCollision = false;
   }
-  
+
   if (userInput.powerHit === 1) {
     // In noserve mode and serve state, the only the opposite player can powerhit
-    if (player.state === 1 && !(modeNum === 2 
-      && !ball.canPowerhitBasedOnCollision 
-      && (player.isPlayer2 === ball.isPlayer2Serve))
+    if (
+      player.state === 1 &&
+      !(
+        modeNum === 2 &&
+        !ball.canPowerhitBasedOnCollision &&
+        player.isPlayer2 === ball.isPlayer2Serve
+      ) &&
       // if modeNum == 3 and
-      && (modeNum != 3 || ball.canPowerhitBasedOnCollision)) {
+      (modeNum != 3 || ball.canPowerhitBasedOnCollision)
+    ) {
       // if player is jumping..
       // then player do power hit!
       // Fixed an issue where 2p would not be powerhit immediately when 1p powerhit the ball
@@ -818,7 +840,7 @@ function processCollisionBetweenBallAndPlayer(
     ball.punchEffectRadius = BALL_RADIUS;
 
     // check if the ball is down powerhitted
-    if (userInput.yDirection==1) {
+    if (userInput.yDirection == 1) {
       ball.isDownPowerhit = true;
     }
 
@@ -828,10 +850,11 @@ function processCollisionBetweenBallAndPlayer(
     ball.sound.powerHit = true;
 
     ball.isPowerHit = true;
-    ball.dribbleCounts = [0,0];
+    ball.dribbleCounts = [0, 0];
   } else {
     if (modeNum == 3) {
-      if (playerX < GROUND_HALF_WIDTH) { // for dribble-limit rules
+      if (playerX < GROUND_HALF_WIDTH) {
+        // for dribble-limit rules
         ball.dribbleCounts[0] += 1;
         ball.dribbleCounts[1] = 0;
       } else {
@@ -842,7 +865,7 @@ function processCollisionBetweenBallAndPlayer(
     ball.isPowerHit = false;
   }
 
-  calculateExpectedLandingPointXFor(ball); 
+  calculateExpectedLandingPointXFor(ball);
 }
 
 /**

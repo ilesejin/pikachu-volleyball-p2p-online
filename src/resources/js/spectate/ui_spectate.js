@@ -29,7 +29,7 @@ export function setUpUI() {
       }
     });
     scrubberRangeInput.addEventListener('mouseup', () => {
-      if (!pausedByBtn && !spectatorPlayer.ticker.started) { 
+      if (!pausedByBtn && !spectatorPlayer.ticker.started) {
         spectatorPlayer.ticker.start();
         spectatorPlayer.playBGMProperly();
       }
@@ -110,28 +110,34 @@ export function setUpUI() {
     e.currentTarget.classList.add('selected');
   }
   function unselectSpeedBtns() {
-    [speedBtn5FPS, speedBtnHalfTimes, speedBtn1Times, speedBtn2Times].forEach(btn => {
-      if (btn) btn.classList.remove('selected');
-    });
+    [speedBtn5FPS, speedBtnHalfTimes, speedBtn1Times, speedBtn2Times].forEach(
+      (btn) => {
+        if (btn) btn.classList.remove('selected');
+      }
+    );
   }
-  
-  if (speedBtn5FPS) speedBtn5FPS.addEventListener('click', (e) => {
-    processSelected(e);
-    spectatorPlayer.adjustPlaybackSpeedFPS(5);
-  });
-  if (speedBtnHalfTimes) speedBtnHalfTimes.addEventListener('click', (e) => {
-    processSelected(e);
-    spectatorPlayer.adjustPlaybackSpeedTimes(0.5);
-  });
-  if (speedBtn1Times) speedBtn1Times.addEventListener('click', (e) => {
-    processSelected(e);
-    spectatorPlayer.adjustPlaybackSpeedTimes(1);
-  });
-  if (speedBtn2Times) speedBtn2Times.addEventListener('click', (e) => {
-    processSelected(e);
-    spectatorPlayer.adjustPlaybackSpeedTimes(2);
-  });
-  
+
+  if (speedBtn5FPS)
+    speedBtn5FPS.addEventListener('click', (e) => {
+      processSelected(e);
+      spectatorPlayer.adjustPlaybackSpeedFPS(5);
+    });
+  if (speedBtnHalfTimes)
+    speedBtnHalfTimes.addEventListener('click', (e) => {
+      processSelected(e);
+      spectatorPlayer.adjustPlaybackSpeedTimes(0.5);
+    });
+  if (speedBtn1Times)
+    speedBtn1Times.addEventListener('click', (e) => {
+      processSelected(e);
+      spectatorPlayer.adjustPlaybackSpeedTimes(1);
+    });
+  if (speedBtn2Times)
+    speedBtn2Times.addEventListener('click', (e) => {
+      processSelected(e);
+      spectatorPlayer.adjustPlaybackSpeedTimes(2);
+    });
+
   // --- FPS ---
   const fpsInput = document.getElementById('fps-input');
   if (fpsInput) {
@@ -145,21 +151,27 @@ export function setUpUI() {
     });
   }
 
-  const noticeBoxEndOfSpectationOKBtn = document.getElementById('notice-end-of-spectation-ok-btn');
+  const noticeBoxEndOfSpectationOKBtn = document.getElementById(
+    'notice-end-of-spectation-ok-btn'
+  );
   if (noticeBoxEndOfSpectationOKBtn) {
     noticeBoxEndOfSpectationOKBtn.addEventListener('click', () => {
       window.location.href = '../';
     });
   }
 
-  const noticeBoxEndOfSpectationNOBtn = document.getElementById('notice-end-of-spectation-no-btn');
+  const noticeBoxEndOfSpectationNOBtn = document.getElementById(
+    'notice-end-of-spectation-no-btn'
+  );
   if (noticeBoxEndOfSpectationNOBtn) {
     noticeBoxEndOfSpectationNOBtn.addEventListener('click', () => {
       hideNoticeEndOfSpectation();
     });
   }
-  
-  const noticeBoxFileErrorOKBtn = document.getElementById('notice-file-open-error-ok-btn');
+
+  const noticeBoxFileErrorOKBtn = document.getElementById(
+    'notice-file-open-error-ok-btn'
+  );
   if (noticeBoxFileErrorOKBtn) {
     noticeBoxFileErrorOKBtn.addEventListener('click', () => {
       window.location.href = '../';
@@ -168,7 +180,9 @@ export function setUpUI() {
 
   // --- Checkboxes ---
   const keyboardContainer = document.getElementById('keyboard-container');
-  const showKeyboardCheckbox = document.getElementById('show-keyboard-checkbox');
+  const showKeyboardCheckbox = document.getElementById(
+    'show-keyboard-checkbox'
+  );
   if (showKeyboardCheckbox) {
     showKeyboardCheckbox.addEventListener('change', () => {
       // @ts-ignore
@@ -193,7 +207,9 @@ export function setUpUI() {
     });
   }
 
-  const showNicknamesCheckbox = document.getElementById('show-nicknames-checkbox');
+  const showNicknamesCheckbox = document.getElementById(
+    'show-nicknames-checkbox'
+  );
   const player1NicknameElem = document.getElementById('player1-nickname');
   const player2NicknameElem = document.getElementById('player2-nickname');
   if (showNicknamesCheckbox) {
@@ -270,8 +286,10 @@ export function setUpUI() {
       }
     });
   }
-  
-  const graphicSharpCheckbox = document.getElementById('graphic-sharp-checkbox');
+
+  const graphicSharpCheckbox = document.getElementById(
+    'graphic-sharp-checkbox'
+  );
   if (graphicSharpCheckbox) {
     graphicSharpCheckbox.addEventListener('change', () => {
       if (spectatorPlayer.pikaVolley === null) {
@@ -281,7 +299,7 @@ export function setUpUI() {
       if (!canvas) {
         return;
       }
-      
+
       // @ts-ignore
       if (graphicSharpCheckbox.checked) {
         canvas.classList.remove('graphic-soft');
@@ -314,8 +332,8 @@ export function setUpLoaderProgressBar(loader) {
   const loadingBox = document.getElementById('loading-box');
   const progressBar = document.getElementById('progress-bar');
   if (!loadingBox || !progressBar) {
-        return;
-      }
+    return;
+  }
 
   loader.onProgress.add(() => {
     progressBar.style.width = `${loader.progress}%`;
@@ -328,7 +346,8 @@ export function setUpLoaderProgressBar(loader) {
 export function adjustFPSInputValue() {
   const fpsInput = document.getElementById('fps-input');
   // @ts-ignore
-  if (fpsInput && spectatorPlayer.ticker) fpsInput.value = spectatorPlayer.ticker.maxFPS;
+  if (fpsInput && spectatorPlayer.ticker)
+    fpsInput.value = spectatorPlayer.ticker.maxFPS;
 }
 
 export function adjustPlayPauseBtnIcon() {
@@ -336,10 +355,10 @@ export function adjustPlayPauseBtnIcon() {
   if (!playPauseBtn || !spectatorPlayer.ticker) {
     return;
   }
-  
+
   const pauseMark = document.getElementById('pause-mark');
   const playMark = document.getElementById('play-mark');
-  if (!pauseMark || !playMark)  {
+  if (!pauseMark || !playMark) {
     return;
   }
 
@@ -351,14 +370,18 @@ export function adjustPlayPauseBtnIcon() {
 }
 
 export function noticeEndOfSpectation() {
-  const noticeBoxEndOfReplay = document.getElementById('notice-end-of-spectation');
+  const noticeBoxEndOfReplay = document.getElementById(
+    'notice-end-of-spectation'
+  );
   if (noticeBoxEndOfReplay) {
     noticeBoxEndOfReplay.classList.remove('hidden');
   }
 }
 
 export function hideNoticeEndOfSpectation() {
-  const noticeBoxEndOfReplay = document.getElementById('notice-end-of-spectation');
+  const noticeBoxEndOfReplay = document.getElementById(
+    'notice-end-of-spectation'
+  );
   if (noticeBoxEndOfReplay) {
     noticeBoxEndOfReplay.classList.add('hidden');
   }
@@ -439,34 +462,78 @@ export function showKeyboardInputs(player1Input, player2Input) {
 
   // Player 1
   switch (player1Input.xDirection) {
-    case 0: unpressKeyElm(dKey); unpressKeyElm(gKey); break;
-    case -1: pressKeyElm(dKey); unpressKeyElm(gKey); break;
-    case 1: unpressKeyElm(dKey); pressKeyElm(gKey); break;
+    case 0:
+      unpressKeyElm(dKey);
+      unpressKeyElm(gKey);
+      break;
+    case -1:
+      pressKeyElm(dKey);
+      unpressKeyElm(gKey);
+      break;
+    case 1:
+      unpressKeyElm(dKey);
+      pressKeyElm(gKey);
+      break;
   }
   switch (player1Input.yDirection) {
-    case 0: unpressKeyElm(rKey); unpressKeyElm(vKey); break;
-    case -1: pressKeyElm(rKey); unpressKeyElm(vKey); break;
-    case 1: unpressKeyElm(rKey); pressKeyElm(vKey); break;
+    case 0:
+      unpressKeyElm(rKey);
+      unpressKeyElm(vKey);
+      break;
+    case -1:
+      pressKeyElm(rKey);
+      unpressKeyElm(vKey);
+      break;
+    case 1:
+      unpressKeyElm(rKey);
+      pressKeyElm(vKey);
+      break;
   }
   switch (player1Input.powerHit) {
-    case 0: unpressKeyElm(zKey); break;
-    case 1: pressKeyElm(zKey); break;
+    case 0:
+      unpressKeyElm(zKey);
+      break;
+    case 1:
+      pressKeyElm(zKey);
+      break;
   }
 
   // Player 2
   switch (player2Input.xDirection) {
-    case 0: unpressKeyElm(leftKey); unpressKeyElm(rightKey); break;
-    case -1: pressKeyElm(leftKey); unpressKeyElm(rightKey); break;
-    case 1: unpressKeyElm(leftKey); pressKeyElm(rightKey); break;
+    case 0:
+      unpressKeyElm(leftKey);
+      unpressKeyElm(rightKey);
+      break;
+    case -1:
+      pressKeyElm(leftKey);
+      unpressKeyElm(rightKey);
+      break;
+    case 1:
+      unpressKeyElm(leftKey);
+      pressKeyElm(rightKey);
+      break;
   }
   switch (player2Input.yDirection) {
-    case 0: unpressKeyElm(upKey); unpressKeyElm(downKey); break;
-    case -1: pressKeyElm(upKey); unpressKeyElm(downKey); break;
-    case 1: unpressKeyElm(upKey); pressKeyElm(downKey); break;
+    case 0:
+      unpressKeyElm(upKey);
+      unpressKeyElm(downKey);
+      break;
+    case -1:
+      pressKeyElm(upKey);
+      unpressKeyElm(downKey);
+      break;
+    case 1:
+      unpressKeyElm(upKey);
+      pressKeyElm(downKey);
+      break;
   }
   switch (player2Input.powerHit) {
-    case 0: unpressKeyElm(enterKey); break;
-    case 1: pressKeyElm(enterKey); break;
+    case 0:
+      unpressKeyElm(enterKey);
+      break;
+    case 1:
+      pressKeyElm(enterKey);
+      break;
   }
 }
 
@@ -539,8 +606,8 @@ function disableReplayScrubberAndBtns() {
 }
 
 export function hideWaitingPeerAssetsStartBox() {
-  const StartBox = document.getElementById("start-box");
-  StartBox.classList.add("hidden");
+  const StartBox = document.getElementById('start-box');
+  StartBox.classList.add('hidden');
 }
 
 /**

@@ -8,7 +8,7 @@ import { displayPartialIPFor, displayNicknameFor } from './nickname_display.js';
 import { replaySaver } from './replay/replay_saver.js';
 import { PikaUserInput } from './offline_version_js/physics.js';
 import { displayMyAndPeerChatEnabledOrDisabled } from './chat_display.js';
-import { InputSaverForSpectator } from "./spectate/spectate_saver.js";
+import { InputSaverForSpectator } from './spectate/spectate_saver.js';
 
 /** @typedef GameState @type {function():void} */
 
@@ -154,7 +154,7 @@ export class PikachuVolleyballOnline extends PikachuVolleyball {
       player2Input.yDirection = this.keyboardArray[1].yDirection;
       player2Input.powerHit = this.keyboardArray[1].powerHit;
       replaySaver.recordInputs(player1Input, player2Input);
-      
+
       if (channel.amICreatedRoom) {
         InputSaverForSpectator.recordInputs(player1Input, player2Input);
       }

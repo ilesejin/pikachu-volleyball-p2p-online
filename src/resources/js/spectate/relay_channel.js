@@ -12,7 +12,7 @@
  * @see {@link https://github.com/uzaramen108/pikavolley-relay-server}
  */
 
-const SERVER_URL = "wss://pikavolley-relay-server.onrender.com"; 
+const SERVER_URL = 'wss://pikavolley-relay-server.onrender.com';
 
 class RelayChannel {
   constructor() {
@@ -29,10 +29,10 @@ class RelayChannel {
    */
   connect(roomId, onOpenCallback) {
     if (this.ws) {
-      console.warn("Relay channel already connected.");
+      console.warn('Relay channel already connected.');
       return;
     }
-    
+
     this.roomId = roomId;
     this._onOpenCallback = onOpenCallback;
     const connectUrl = `${SERVER_URL}/${roomId}`;
@@ -41,7 +41,7 @@ class RelayChannel {
     this.ws = new WebSocket(connectUrl);
 
     this.ws.onopen = () => {
-      console.log("Relay server connected.");
+      console.log('Relay server connected.');
       if (this._onOpenCallback) {
         this._onOpenCallback();
       }
@@ -53,18 +53,18 @@ class RelayChannel {
           const data = JSON.parse(event.data);
           this._onMessageCallback(data);
         } catch (e) {
-          console.error("Failed to parse server message:", e);
+          console.error('Failed to parse server message:', e);
         }
       }
     };
 
     this.ws.onclose = () => {
-      console.log("Relay server disconnected.");
+      console.log('Relay server disconnected.');
       this.ws = null;
     };
 
     this.ws.onerror = (err) => {
-      console.error("Relay WebSocket error:", err);
+      console.error('Relay WebSocket error:', err);
     };
   }
 
@@ -76,7 +76,7 @@ class RelayChannel {
     if (this.ws && this.ws.readyState === 1 /* WebSocket.OPEN */) {
       this.ws.send(JSON.stringify(data));
     } else {
-      console.error("Relay channel is not open. Cannot send message.");
+      console.error('Relay channel is not open. Cannot send message.');
     }
   }
 

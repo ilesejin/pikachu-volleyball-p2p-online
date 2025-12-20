@@ -9,10 +9,11 @@ import {
 import { Cloud, Wave } from '../offline_version_js/cloud_and_wave.js';
 import { PikaPhysics } from '../offline_version_js/physics.js';
 import { convert5bitNumberToUserInput } from '../utils/input_conversion.js';
-import { noticeEndOfSpectation,
+import {
+  noticeEndOfSpectation,
   hideWaitingPeerAssetsStartBox,
   moveScrubberTo,
-  showKeyboardInputs
+  showKeyboardInputs,
 } from './ui_spectate.js';
 import { setTickerMaxFPSAccordingToNormalFPS } from './spectate_player.js';
 

@@ -59,8 +59,8 @@ class ReplaySaver {
       (convertUserInputTo5bitNumber(player1Input) << 5) +
       convertUserInputTo5bitNumber(player2Input);
     relayChannel.send({
-      type: "inputs",
-      value: usersInputNumber
+      type: 'inputs',
+      value: usersInputNumber,
     });
   }
 
@@ -71,8 +71,8 @@ class ReplaySaver {
   recordOptions(usersInputOption) {
     //this.options.push([this.frameCounter, options]);
     relayChannel.send({
-      type: "options",
-      options: usersInputOption
+      type: 'options',
+      options: usersInputOption,
     });
   }
 
@@ -84,17 +84,16 @@ class ReplaySaver {
   recordChats(Message, PlayerSide) {
     //this.chats.push([this.frameCounter, whichPlayerSide, chatMessage]);
     relayChannel.send({
-      type: "chat",
+      type: 'chat',
       whichPlayerSide: PlayerSide,
-      chatMessage: Message
+      chatMessage: Message,
     });
   }
 
   /**
    * Save as a file
    */
-  saveAsFile() {
-  }
+  saveAsFile() {}
 }
 
 export const InputSaverForSpectator = new ReplaySaver();

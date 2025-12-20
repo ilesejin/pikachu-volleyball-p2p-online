@@ -5,7 +5,7 @@ import { spectatorPlayer } from './spectate_player.js';
 adjustAssetsPath();
 setUpUI();
 
-(() => { 
+(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room');
 
@@ -16,7 +16,8 @@ setUpUI();
     console.error("There isn't parameter 'room' in [Spectator] URL.");
     const loadingUI = document.getElementById('spectator-loading');
     if (loadingUI) {
-      loadingUI.innerHTML = "<p>Error. Room ID for spectation Isn't detected.</p>";
+      loadingUI.innerHTML =
+        "<p>Error. Room ID for spectation Isn't detected.</p>";
     }
   }
 })();

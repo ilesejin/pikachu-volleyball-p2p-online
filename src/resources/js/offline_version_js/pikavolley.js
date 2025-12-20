@@ -72,7 +72,7 @@ export class PikachuVolleyball {
     /** @type {number} limit of down serves */
     this.downServeLimit = 3;
     /** @type {number[]} limit of down serves */
-    this.dribbleReset = [0,0];
+    this.dribbleReset = [0, 0];
     /** @type {number} score when the down serve gets banned */
     this.serveLimitScore = 10;
     /** @type {number} winning score: if either one of the players reaches this score, game ends */
@@ -139,7 +139,7 @@ export class PikachuVolleyball {
       this.slowMotionNumOfSkippedFrames++;
       if (
         this.slowMotionNumOfSkippedFrames %
-        Math.round(this.normalFPS / this.slowMotionFPS) !==
+          Math.round(this.normalFPS / this.slowMotionFPS) !==
         0
       ) {
         return;
@@ -316,9 +316,13 @@ export class PikachuVolleyball {
       this.downServeCounts[0] = this.downServeLimit;
       this.downServeCounts[1] = this.downServeLimit;
       if (this.physics.modeNum == 1) {
-        this.view.game.drawDownServeCountsToDownServeBoards(this.downServeCounts);
+        this.view.game.drawDownServeCountsToDownServeBoards(
+          this.downServeCounts
+        );
       } else if (this.physics.modeNum == 3) {
-        this.view.game.drawDownServeCountsToDownServeBoards(this.physics.ball.dribbleCounts);
+        this.view.game.drawDownServeCountsToDownServeBoards(
+          this.physics.ball.dribbleCounts
+        );
       }
 
       this.currentServeRecord = [];
@@ -375,10 +379,13 @@ export class PikachuVolleyball {
       if (this.roundEnded) {
         this.view.game.drawDownServeCountsToDownServeBoards(this.dribbleReset);
       } else {
-        this.view.game.drawDownServeCountsToDownServeBoards(this.physics.ball.dribbleCounts);
+        this.view.game.drawDownServeCountsToDownServeBoards(
+          this.physics.ball.dribbleCounts
+        );
       }
     }
-    if (this.roundEnded === false && this.physics.ball.isServeState) // Record serve path only at a ServeState and round isn't ended
+    if (this.roundEnded === false && this.physics.ball.isServeState)
+      // Record serve path only at a ServeState and round isn't ended
       this.currentServeRecord.push([this.physics.ball.x, this.physics.ball.y]);
 
     this.playSoundEffect();
@@ -401,28 +408,30 @@ export class PikachuVolleyball {
 
     // ended by down serve and not updated yet
     let didFoul = false; // did down serve after limit ended
-    if (this.physics.ball.endByDownServe && !this.physics.ball.updatedDownServe) {
+    if (
+      this.physics.ball.endByDownServe &&
+      !this.physics.ball.updatedDownServe
+    ) {
       this.physics.ball.updatedDownServe = true;
       if (this.physics.ball.isPlayer2Serve) {
         if (this.downServeCounts[1] > 0 && this.physics.modeNum == 1) {
           this.downServeCounts[1] -= 1;
-        }
-        else {
+        } else {
           // down serve limit ended.
           didFoul = true;
         }
-      }
-      else {
+      } else {
         if (this.downServeCounts[0] > 0 && this.physics.modeNum == 1) {
           this.downServeCounts[0] -= 1;
-        }
-        else {
+        } else {
           // down serve limit ended
           didFoul = true;
         }
       }
       if (this.physics.modeNum == 1) {
-        this.view.game.drawDownServeCountsToDownServeBoards(this.downServeCounts);
+        this.view.game.drawDownServeCountsToDownServeBoards(
+          this.downServeCounts
+        );
       }
     }
 
@@ -432,7 +441,12 @@ export class PikachuVolleyball {
       this.roundEnded === false &&
       this.gameEnded === false
     ) {
-      if (this.isIdenticalServe && this.physics.ball.isServeState && this.physics.modeNum == 1) { // Did an identical serve and is still in a serve state, Modenum logic doesn't working(uzaramen)
+      if (
+        this.isIdenticalServe &&
+        this.physics.ball.isServeState &&
+        this.physics.modeNum == 1
+      ) {
+        // Did an identical serve and is still in a serve state, Modenum logic doesn't working(uzaramen)
         if (!this.physics.ball.isPlayer2Serve) {
           this.isPlayer2Serve = true;
           this.scores[0] = Math.max(this.scores[0] - 1, 0);
@@ -440,16 +454,20 @@ export class PikachuVolleyball {
           this.isPlayer2Serve = false;
           this.scores[1] = Math.max(this.scores[1] - 1, 0);
         }
-      } else if ((didFoul || this.physics.ball.endByThunder == true) && (this.physics.modeNum == 1 || this.physics.modeNum == 3)) { // if the game ended by foul (down serve limit ended or Thunder serve)
+      } else if (
+        (didFoul || this.physics.ball.endByThunder == true) &&
+        (this.physics.modeNum == 1 || this.physics.modeNum == 3)
+      ) {
+        // if the game ended by foul (down serve limit ended or Thunder serve)
         if (this.physics.ball.isPlayer2Serve) {
           this.isPlayer2Serve = false;
           this.scores[0] += 1;
-        }
-        else {
+        } else {
           this.isPlayer2Serve = true;
           this.scores[1] += 1;
         }
-      } else { // game ended normally
+      } else {
+        // game ended normally
         if (this.physics.ball.punchEffectX < GROUND_HALF_WIDTH) {
           this.isPlayer2Serve = true;
           this.scores[1] += 1;
@@ -482,9 +500,11 @@ export class PikachuVolleyball {
 
       this.view.game.drawScoresToScoreBoards(this.scores);
       if (this.physics.modeNum == 1) {
-        this.view.game.drawDownServeCountsToDownServeBoards(this.downServeCounts);
+        this.view.game.drawDownServeCountsToDownServeBoards(
+          this.downServeCounts
+        );
       }
-      
+
       if (this.roundEnded === false && this.gameEnded === false) {
         this.slowMotionFramesLeft = this.SLOW_MOTION_FRAMES_NUM;
       }
@@ -631,7 +651,9 @@ export class PikachuVolleyball {
 
   /** @return {boolean} */
   get isIdenticalServe() {
-    return JSON.stringify(this.currentServeRecord) === JSON.stringify(this.previousServeRecord);
+    return (
+      JSON.stringify(this.currentServeRecord) ===
+      JSON.stringify(this.previousServeRecord)
+    );
   }
-
 }

@@ -26,7 +26,7 @@ import { replaySaver } from './replay/replay_saver.js';
 import { showBlockThisPeerBtn } from './block_other_players/ui.js';
 import '../style.css';
 import { MATCH_GROUP } from './quick_match/match_group.js';
-import { InputSaverForSpectator } from "./spectate/spectate_saver.js";
+import { InputSaverForSpectator } from './spectate/spectate_saver.js';
 
 /** @typedef {import('./pikavolley_online.js').PikachuVolleyballOnline} PikachuVolleyballOnline */
 /** @typedef {import('@pixi/ticker').Ticker} Ticker */
@@ -35,7 +35,7 @@ import { InputSaverForSpectator } from "./spectate/spectate_saver.js";
 /** @type {number} maximum nickname length */
 export const MAX_NICKNAME_LENGTH = 8;
 
-const API_URL = "https://pikavolley-relay-server.onrender.com";
+const API_URL = 'https://pikavolley-relay-server.onrender.com';
 
 /**
  * This is for to enable changing game options event before loading the game assets.
@@ -251,8 +251,11 @@ export function setUpUI() {
     'auto-save-replay-checkbox'
   );
   try {
-    const storedValue = window.localStorage.getItem('willSaveReplayAutomatically');
-    willSaveReplayAutomatically = storedValue === null ? true : storedValue === 'true';
+    const storedValue = window.localStorage.getItem(
+      'willSaveReplayAutomatically'
+    );
+    willSaveReplayAutomatically =
+      storedValue === null ? true : storedValue === 'true';
   } catch (err) {
     console.log(err);
   }
@@ -877,14 +880,14 @@ export function setUpUI() {
 
   const exitBtn = document.getElementById('exit-btn');
   exitBtn.addEventListener('click', () => {
-    console.log("나는 더미2");
+    console.log('나는 더미2');
     location.reload();
   });
 
   const spectatorBtn = document.getElementById('show-list-for-spectator');
   const spectatorBox = document.getElementById('spectator-room-list-box');
   spectatorBtn.addEventListener('click', () => {
-    console.log("나는 더미1");
+    console.log('나는 더미1');
     spectatorBox.classList.remove('hidden');
     fetchSpectatorRoomList();
   });
@@ -1265,8 +1268,7 @@ function askOptionsChangeSendToPeer(options) {
     }
   } else if (options.rule) {
     optionsChangeBox.textContent =
-      document.getElementById('rule-submenu-btn').textContent.trim() +
-      ' ';
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
     switch (options.rule) {
       case 'Pgo':
         optionsChangeBox.textContent += document
@@ -1352,8 +1354,7 @@ export function askOptionsChangeReceivedFromPeer(options) {
     }
   } else if (options.rule) {
     optionsChangeBox.textContent =
-      document.getElementById('rule-submenu-btn').textContent.trim() +
-      ' ';
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
     switch (options.rule) {
       case 'Pgo':
         optionsChangeBox.textContent += document
@@ -1605,7 +1606,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'slow', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'slow',
+      winningScore: null,
+      rule: null,
+    });
   });
   mediumSpeedBtn.addEventListener('click', () => {
     if (mediumSpeedBtn.classList.contains('selected')) {
@@ -1616,7 +1621,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'medium', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'medium',
+      winningScore: null,
+      rule: null,
+    });
   });
   fastSpeedBtn.addEventListener('click', () => {
     if (fastSpeedBtn.classList.contains('selected')) {
@@ -1627,7 +1636,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'fast', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'fast',
+      winningScore: null,
+      rule: null,
+    });
   });
   noticeBoxGameInProgressForSpeedOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForSpeed.classList.contains('hidden')) {
@@ -1707,7 +1720,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'Pgo' });
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'Pgo',
+    });
   });
   noserveRuleBtn.addEventListener('click', () => {
     if (noserveRuleBtn.classList.contains('selected')) {
@@ -1718,7 +1735,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'noserve' });
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'noserve',
+    });
   });
   DL36RuleBtn.addEventListener('click', () => {
     if (DL36RuleBtn.classList.contains('selected')) {
@@ -1729,7 +1750,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'DL36' });
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'DL36',
+    });
   });
   noticeBoxGameInProgressForRuleOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForRule.classList.contains('hidden')) {
@@ -2084,7 +2109,7 @@ async function fetchSpectatorRoomList() {
       spectatorFetchInterval = setTimeout(fetchSpectatorRoomList, 2000); // Searching again at 2 sec period
     }
   } catch (e) {
-    console.error("Failed for loading list or rooms:", e);
+    console.error('Failed for loading list or rooms:', e);
     noRoomDiv.classList.add('hidden');
     spectatorFetchInterval = setTimeout(fetchSpectatorRoomList, 2000); // Searching again at 2 sec period
   }
@@ -2098,7 +2123,7 @@ async function fetchSpectatorRoomList() {
 function buildRoomTable(contentDiv, rooms) {
   const table = document.createElement('table');
   table.id = 'spectator-room-list-table';
-  
+
   const thead = document.createElement('thead');
   thead.innerHTML = `
     <tr>
@@ -2106,34 +2131,35 @@ function buildRoomTable(contentDiv, rooms) {
       <th>Player 2</th>
     </tr>
   `;
-  
+
   const tbody = document.createElement('tbody');
-  
-  rooms.forEach(room => {
+
+  rooms.forEach((room) => {
     const tr = document.createElement('tr');
     tr.className = 'spectator-room-row';
-    tr.dataset.roomId = room.id; 
+    tr.dataset.roomId = room.id;
 
     const p1Nick = room.nicknames[0] || 'Player 1';
     const p2Nick = room.nicknames[1] || 'Player 2';
     const p1IP = room.ips[0] || '*.*';
     const p2IP = room.ips[1] || '*.*';
-    
+
     tr.innerHTML = `
       <td>${p1Nick}(${p1IP})</td>
       <td>${p2Nick}(${p2IP})</td>
     `;
 
-    tr.addEventListener('click', () => { // Move to spectator/index.html
+    tr.addEventListener('click', () => {
+      // Move to spectator/index.html
       window.location.href = `spectator/index.html?room=${room.id}`;
     });
-    
+
     tbody.appendChild(tr);
   });
 
   table.appendChild(thead);
   table.appendChild(tbody);
-  
-  contentDiv.innerHTML = "";
+
+  contentDiv.innerHTML = '';
   contentDiv.appendChild(table);
 }

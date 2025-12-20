@@ -76,7 +76,7 @@ import { relayChannel } from '../spectate/relay_channel.js';
 /** @typedef {{speed: string, winningScore: number, rule: string}} Options */
 
 const firebaseApp = initializeApp(firebaseConfig);
-const RELAY_SERVER_URL = "wss://pikavolley-relay-server.onrender.com"; 
+const RELAY_SERVER_URL = 'wss://pikavolley-relay-server.onrender.com';
 let spectatorSocket = null;
 
 // It is set to (1 << 16) since syncCounter is to be sent as Uint16
@@ -484,7 +484,7 @@ function receiveChatMessageFromPeer(chatMessage) {
         .slice(0, -1)
         .trim()
         .slice(0, MAX_NICKNAME_LENGTH);
-      displayPeerNicknameFor(channel.peerNickname, channel.amICreatedRoom); 
+      displayPeerNicknameFor(channel.peerNickname, channel.amICreatedRoom);
       // Replaced function for filtering peer's nickname
       displayNicknameFor(channel.myNickname, !channel.amICreatedRoom);
       displayPartialIPFor(channel.peerPartialPublicIP, channel.amICreatedRoom);
@@ -944,10 +944,10 @@ function dataChannelOpened() {
 function dataChannelClosed() {
   console.log('data channel closed');
   relayChannel.send({
-    type: "inputs",
-    value: -1 // Value that norices the game is over
+    type: 'inputs',
+    value: -1, // Value that norices the game is over
   });
-  relayChannel.ws.onclose
+  relayChannel.ws.onclose;
   channel.isOpen = false;
   cleanUpFirestoreRelevants(); // 플레이어와의 접속 종료 시 id 파기
   noticeDisconnected();
@@ -1066,30 +1066,32 @@ function connectAsHostRelay() {
   if (spectatorSocket) {
     return; // 이미 연결됨
   }
-  
-  console.log("[Host Relay] Connecting to relay server...");
+
+  console.log('[Host Relay] Connecting to relay server...');
   try {
     // 'roomId'는 data_channel.js의 전역 변수일 테니 그대로 쓰네
-    const wsUrl = `${RELAY_SERVER_URL}/${roomId}`; 
+    const wsUrl = `${RELAY_SERVER_URL}/${roomId}`;
     spectatorSocket = new WebSocket(wsUrl);
 
     spectatorSocket.onopen = () => {
-      console.log("[Host Relay] Broadcasting connection open.");
+      console.log('[Host Relay] Broadcasting connection open.');
       // [중요] 서버에 "내가 이 방의 호스트(방송국)다"라고 알려주네
-      spectatorSocket.send(JSON.stringify({ 
-        type: "identify_host", 
-      }));
+      spectatorSocket.send(
+        JSON.stringify({
+          type: 'identify_host',
+        })
+      );
     };
     spectatorSocket.onerror = (err) => {
-      console.error("[Host Relay] Socket error:", err);
+      console.error('[Host Relay] Socket error:', err);
       spectatorSocket = null;
     };
     spectatorSocket.onclose = () => {
-      console.log("[Host Relay] Broadcasting closed.");
+      console.log('[Host Relay] Broadcasting closed.');
       spectatorSocket = null;
-    }
+    };
   } catch (err) {
-    console.error("[Host Relay] Failed to connect:", err);
+    console.error('[Host Relay] Failed to connect:', err);
     spectatorSocket = null;
   }
 }
