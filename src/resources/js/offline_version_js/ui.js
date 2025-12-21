@@ -7,7 +7,7 @@ import { localStorageWrapper } from './utils/local_storage_wrapper.js';
 
 /** @typedef {import('./pikavolley.js').PikachuVolleyball} PikachuVolleyball */
 /** @typedef {import('@pixi/ticker').Ticker} Ticker */
-/** @typedef {{graphic?: string, bgm?: string, sfx?: string, speed?: string, winningScore?: string}} Options */
+/** @typedef {{graphic?: string, bgm?: string, sfx?: string, speed?: string, winningScore?: string, rule?: string}} Options */
 
 /**
  * Enum for "game paused by what?".
@@ -120,6 +120,20 @@ export function setUpUI(pikaVolley, ticker) {
         pikaVolley.winningScore = 15;
         break;
     }
+    switch (options.rule) {
+      case 'Pgo':
+        pikaVolley.physics.modeNum = 1;
+        pikaVolley.changeDownBoardVisibility(true);
+        break;
+      case 'noserve':
+        pikaVolley.physics.modeNum = 2;
+        pikaVolley.changeDownBoardVisibility(false);
+        break;
+      case 'DL36':
+        pikaVolley.physics.modeNum = 3;
+        pikaVolley.changeDownBoardVisibility(true);
+        break;
+    }
   };
 
   /**
@@ -143,6 +157,9 @@ export function setUpUI(pikaVolley, ticker) {
     if (options.winningScore) {
       localStorageWrapper.set('pv-offline-winningScore', options.winningScore);
     }
+    if (options.rule) {
+      localStorageWrapper.set('pv-offline-rule', options.rule);
+    }
   };
 
   /**
@@ -155,6 +172,7 @@ export function setUpUI(pikaVolley, ticker) {
     sfx: localStorageWrapper.get('pv-offline-sfx'),
     speed: localStorageWrapper.get('pv-offline-speed'),
     winningScore: localStorageWrapper.get('pv-offline-winningScore'),
+    rule: localStorageWrapper.get('pv-offline-rule'),
   });
 
   /**
@@ -281,6 +299,84 @@ function setUpBtns(pikaVolley, applyAndSaveOptions) {
   });
   fastSpeedBtn.addEventListener('click', () => {
     applyAndSaveOptions({ speed: 'fast' });
+  });
+
+  const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
+  const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+  const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
+  const noticeBox3 = document.getElementById('notice-box-3');
+  const noticeOKBtn3 = document.getElementById('notice-ok-btn-3');
+  function isGameStarted() {
+    return (
+      pikaVolley.state === pikaVolley.round ||
+      pikaVolley.state === pikaVolley.afterEndOfRound ||
+      pikaVolley.state === pikaVolley.beforeStartOfNextRound ||
+      pikaVolley.state === pikaVolley.beforeStartOfNewGame ||
+      pikaVolley.state === pikaVolley.startOfNewGame
+    );
+  }
+  PgoRuleBtn.addEventListener('click', () => {
+    if (PgoRuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameStarted()) {
+      noticeBox3.classList.remove('hidden');
+      // @ts-ignore
+      gameDropdownBtn.disabled = true;
+      // @ts-ignore
+      optionsDropdownBtn.disabled = true;
+      // @ts-ignore
+      aboutBtn.disabled = true;
+      pauseResumeManager.pause(pikaVolley, PauseResumePrecedence.messageBox);
+      return;
+    }
+    applyAndSaveOptions({ rule: 'Pgo' });
+  });
+  noserveRuleBtn.addEventListener('click', () => {
+    if (noserveRuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameStarted()) {
+      noticeBox3.classList.remove('hidden');
+      // @ts-ignore
+      gameDropdownBtn.disabled = true;
+      // @ts-ignore
+      optionsDropdownBtn.disabled = true;
+      // @ts-ignore
+      aboutBtn.disabled = true;
+      pauseResumeManager.pause(pikaVolley, PauseResumePrecedence.messageBox);
+      return;
+    }
+    applyAndSaveOptions({ rule: 'noserve' });
+  });
+  DL36RuleBtn.addEventListener('click', () => {
+    if (DL36RuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameStarted()) {
+      noticeBox3.classList.remove('hidden');
+      // @ts-ignore
+      gameDropdownBtn.disabled = true;
+      // @ts-ignore
+      optionsDropdownBtn.disabled = true;
+      // @ts-ignore
+      aboutBtn.disabled = true;
+      pauseResumeManager.pause(pikaVolley, PauseResumePrecedence.messageBox);
+      return;
+    }
+    applyAndSaveOptions({ rule: 'DL36' });
+  });
+  noticeOKBtn3.addEventListener('click', () => {
+    if (!noticeBox3.classList.contains('hidden')) {
+      noticeBox3.classList.add('hidden');
+      // @ts-ignore
+      gameDropdownBtn.disabled = false;
+      // @ts-ignore
+      optionsDropdownBtn.disabled = false;
+      // @ts-ignore
+      aboutBtn.disabled = false;
+      pauseResumeManager.resume(pikaVolley, PauseResumePrecedence.messageBox);
+    }
   });
 
   const winningScore5Btn = document.getElementById('winning-score-5-btn');
@@ -472,8 +568,9 @@ function setUpBtns(pikaVolley, applyAndSaveOptions) {
       graphic: 'sharp',
       bgm: 'on',
       sfx: 'stereo',
-      speed: 'medium',
+      speed: 'fast',
       winningScore: '15',
+      rule: 'noserve',
     };
     applyAndSaveOptions(defaultOptions);
   });
@@ -578,6 +675,28 @@ function setSelectedOptionsBtn(options) {
         break;
     }
   }
+  if (options.rule) {
+    const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
+    const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+    const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
+    switch (options.rule) {
+      case 'Pgo':
+        PgoRuleBtn.classList.add('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.remove('selected');
+        break;
+      case 'noserve':
+        PgoRuleBtn.classList.remove('selected');
+        noserveRuleBtn.classList.add('selected');
+        DL36RuleBtn.classList.remove('selected');
+        break;
+      case 'DL36':
+        PgoRuleBtn.classList.remove('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.add('selected');
+        break;
+    }
+  }
 }
 
 /**
@@ -637,6 +756,11 @@ function setUpToShowDropdownsAndSubmenus(pikaVolley) {
       showSubmenu('practice-mode-submenu-btn', 'practice-mode-submenu');
     });
   document
+    .getElementById('rule-submenu-btn')
+    .addEventListener('mouseover', () => {
+      showSubmenu('rule-submenu-btn', 'rule-submenu');
+    });
+  document
     .getElementById('reset-to-default-btn')
     .addEventListener('mouseover', () => {
       hideSubmenus();
@@ -663,6 +787,10 @@ function setUpToShowDropdownsAndSubmenus(pikaVolley) {
     .addEventListener('click', () => {
       showSubmenu('practice-mode-submenu-btn', 'practice-mode-submenu');
     });
+  document.getElementById('rule-submenu-btn').addEventListener('click', () => {
+    // physics.js manages the rule button, so this code is useless now
+    showSubmenu('rule-submenu-btn', 'rule-submenu');
+  });
   document
     .getElementById('reset-to-default-btn')
     .addEventListener('click', () => {

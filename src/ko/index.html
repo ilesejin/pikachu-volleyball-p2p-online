@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>피카츄 배구 P2P 온라인</title>
+    <title>대회용 피카츄 배구 P2P 온라인</title>
     <meta
       name="description"
       content="피카츄 배구 게임을 P2P 연결을 통해 온라인으로 플레이하세요"
@@ -21,7 +21,7 @@
   <body>
     <div id="before-connection" class="limit-width">
       <div id="about-box-head">
-        <h1>피카츄 배구 <span class="no-wrap">P2P 온라인</span></h1>
+        <h1>대회용 피카츄 배구 <span class="no-wrap">P2P 온라인</span></h1>
         <div class="if-embedded-in-other-website hidden">
           <div class="limit-width">
             타 사이트 상에서 피카츄 배구 P2P 온라인을 실행하고 있는 것 같습니다.
@@ -49,12 +49,12 @@
           />
           <label for="dark-color-scheme-checkbox-1"></label>
         </div>
-        <p class="languages">
+        <!-- <p class="languages">
           <a href="../en/" target="_self">English</a>
           | &check; Korean(한국어)
-        </p>
+        </p> -->
         <p class="offline-version">
-          <a href="https://gorisanson.github.io/pikachu-volleyball/ko/"
+          <a href="https://ilesejin.github.io/pikachu-volleyball/ko/"
             >오프라인 웹 버전</a
           >도 있습니다.
         </p>
@@ -77,10 +77,16 @@
             ><a href="https://gorisanson.github.io/">이규태</a></span
           >
         </p>
+        <p class="modified-by">
+          <span class="no-wrap"><a href="https://open.kakao.com/o/g0Cs478f">피카츄배구 온라인</a>에서 진행되는 대회용 피카츄 배구입니다. <br />
+            웹 버전을 대회 규칙에 맞게 수정하였습니다. <br />
+            수정한 사람:
+            <span class="no-wrap"><a href="https://github.com/ilesejin">엑사바이트</a></span>
+        </p>
         <p class="source-code-on">
           소스 코드를
           <a
-            href="https://github.com/gorisanson/pikachu-volleyball-p2p-online"
+            href="https://github.com/ilesejin/pikachu-volleyball-p2p-online"
             target="_blank"
             rel="noopener"
             >GitHub</a
@@ -197,6 +203,14 @@
               끄기를 권장합니다.)</label
             >
           </div>
+          <div class="margin-top-a-little">
+            <input id="basic-chat-filter-checkbox" type="checkbox" checked="checked"/>
+            <label for="basic-chat-filter-checkbox"
+              >기본 욕설 필터 사용 (상대방과의 채팅에서 미리 지정된 금지어에 대해
+              검열합니다. 추가적인 금지어 작성은 퀵 매치 차단 목록 아래에서 작성
+              가능합니다.)</label
+            >
+          </div>
         </div>
         <div>
           <p class="margin-top">
@@ -298,6 +312,7 @@
       <div class="margin-top grid-1-1">
         <button type="button" id="quick-match-btn">퀵 매치 (엔터)</button>
         <button type="button" id="with-your-friend-btn">친구와 함께</button>
+        <button type="button" id="show-list-for-spectator">관전하기</button>
       </div>
       <div id="blocked-ip-addresses-table-container" class="margin-top">
         <details>
@@ -317,6 +332,47 @@
             <tfoot>
               <tr>
                 <td colspan="3">
+                  <button type="button" class="delete-btn">
+                    목록에서 삭제
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </details>
+      </div>
+      <div id="blocked-bad-words-table-container" class="margin-top">
+        <details>
+          <summary>
+            추가 금지어 목록 (<span id="number-of-bad-words-addresses">0</span>/50)
+          </summary>
+          <table class="blocked-bad-words-table">
+            <thead>
+              <tr>
+                <th>금지어 내용</th>
+                <th>작성 날짜</th>
+              </tr>
+            </thead>
+            <tbody>
+              </tbody>
+            <tfoot>
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    id="new-custom-word-input"
+                    placeholder="추가할 금지어"
+                    style="width: 100%;"
+                  />
+                </td>
+                <td>
+                  <button type="button" id="add-custom-word-btn" style="width: 100%;">
+                    등록
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
                   <button type="button" class="delete-btn">
                     목록에서 삭제
                   </button>
@@ -676,6 +732,27 @@
         </button>
       </div>
     </div>
+    <div
+      id="spectator-room-list-box"
+      class="fade-in-box notice fixed hidden"
+    >
+      <p class="thick">현재 방송 중인 방 목록</p>
+      <div id="spectator-room-list-content">
+        <div id="Loading-room-list">
+          <p>관전 가능한 방 검색 중...</p>
+        </div>
+        <div id="No-room-list" class="hidden">
+          <p>관전 가능한 방이 없습니다.</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="cancel-spectate-btn"
+        class="btn-in-box large"
+      >
+        <span class="no-wrap">나가기</span>
+      </button>
+    </div>
     <div id="flex-container" class="hidden">
       <div id="menu-bar">
         <div class="btn-container left">
@@ -794,6 +871,26 @@
                   </button>
                 </div>
               </div>
+              <div class="relative-container">
+                <button
+                  type="button"
+                  id="rule-submenu-btn"
+                  class="btn submenu-btn"
+                >
+                  룰 &#9654;&#xfe0e;
+                </button>
+                <div id="rule-submenu" class="submenu">
+                  <button type="button" id="Pgo-rule-btn" class="btn selected">
+                    <span class="check">&check; </span>Pgo 룰
+                  </button>
+                  <button type="button" id="noserve-rule-btn" class="btn">
+                    <span class="check">&check; </span>노서브 룰
+                  </button>
+                  <button type="button" id="Down-Limit-36-rule-btn" class="btn">
+                    <span class="check">&check; </span>DL 3·6 룰
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="relative-container">
@@ -845,6 +942,11 @@
           <div class="nickname-and-partial-ip left">
             <span id="player1-nickname" class="nickname"></span>
             <span id="player1-partial-ip" class="partial-ip"></span>
+            <span
+              id="player1-hiding-peer-nickname"
+              class="hiding-peer-nickname hidden"
+              >상대방 닉네임 가림</span
+            >
             <span id="player1-chat-disabled" class="chat-disabled hidden"
               >채팅 끔</span
             >
@@ -852,6 +954,11 @@
           <div class="nickname-and-partial-ip right">
             <span id="player2-nickname" class="nickname"></span>
             <span id="player2-partial-ip" class="partial-ip"></span>
+            <span
+              id="player2-hiding-peer-nickname"
+              class="hiding-peer-nickname hidden"
+              >상대방 닉네임 가림</span
+            >
             <span id="player2-chat-disabled" class="chat-disabled hidden"
               >채팅 끔</span
             >
@@ -1002,6 +1109,22 @@
             알겠어요 (Y)
           </button>
         </div>
+        <div
+          class="fade-in-box notice hidden"
+          id="notice-rule-options-cannot-changed-if-game-in-progress"
+        >
+          <p>
+            룰 설정은 경기가 진행 중에는 변경할 수 없습니다. 현재 진행
+            중인 경기가 끝난 후 다시 시도해주세요.
+          </p>
+          <button
+            type="button"
+            id="notice-rule-options-cannot-changed-if-game-in-progress-ok-btn"
+            class="btn-in-box key-y"
+          >
+            알겠어요 (Y)
+          </button>
+        </div>
         <div class="fade-in-box notice hidden" id="ask-one-more-game">
           <p>상대방과 한 판 더 할까요?</p>
           <div class="grid-1-1 center">
@@ -1104,6 +1227,9 @@
           <button type="button" id="chat-disabling-btn">채팅 끄기</button>
           <div id="text-disable-chat" class="hidden">채팅 끄기</div>
           <div id="text-enable-chat" class="hidden">채팅 켜기</div>
+          <button type="button" id="nickname-hide-btn">닉네임 가리기</button>
+          <div id="text-hide-nickname" class="hidden">닉네임 가리기</div>
+          <div id="text-show-nickname" class="hidden">닉네임 보이기</div>
         </div>
       </div>
     </div>

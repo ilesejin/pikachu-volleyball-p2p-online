@@ -1,4 +1,4 @@
-/**
+/**send
  * Manages outputs to and inputs from the html elements UI
  * and event listeners relevant to the UI of the web page
  */
@@ -26,24 +26,28 @@ import { replaySaver } from './replay/replay_saver.js';
 import { showBlockThisPeerBtn } from './block_other_players/ui.js';
 import '../style.css';
 import { MATCH_GROUP } from './quick_match/match_group.js';
+import { InputSaverForSpectator } from './spectate/spectate_saver.js';
 
 /** @typedef {import('./pikavolley_online.js').PikachuVolleyballOnline} PikachuVolleyballOnline */
 /** @typedef {import('@pixi/ticker').Ticker} Ticker */
-/** @typedef {{speed: string, winningScore: number}} Options options communicated with the peer */
+/** @typedef {{speed: string, winningScore: number, rule: string}} Options options communicated with the peer */
 
 /** @type {number} maximum nickname length */
 export const MAX_NICKNAME_LENGTH = 8;
 
+const API_URL = 'https://pikavolley-relay-server.onrender.com';
+
 /**
  * This is for to enable changing game options event before loading the game assets.
- * @type {{graphic: string, bgm: string, sfx: string, speed: string, winningScore: number}}
+ * @type {{graphic: string, bgm: string, sfx: string, speed: string, winningScore: number, rule: string}}
  */
 const optionsChangedBeforeLoadingGameAssets = {
   graphic: 'sharp', // local option i.e. not communicated with the peer
   bgm: 'on', // local option i.e. not communicated with the peer
   sfx: 'stereo', // local option i.e. not communicated with the peer
-  speed: 'medium',
+  speed: 'fast',
   winningScore: 15,
+  rule: 'Pgo',
 };
 
 // This function is changed after the game assets are loaded
@@ -63,6 +67,9 @@ let applyOptions = (options) => {
   }
   if (options.winningScore) {
     optionsChangedBeforeLoadingGameAssets.winningScore = options.winningScore;
+  }
+  if (options.rule) {
+    optionsChangedBeforeLoadingGameAssets.rule = options.rule;
   }
 };
 
@@ -244,8 +251,11 @@ export function setUpUI() {
     'auto-save-replay-checkbox'
   );
   try {
+    const storedValue = window.localStorage.getItem(
+      'willSaveReplayAutomatically'
+    );
     willSaveReplayAutomatically =
-      'true' === window.localStorage.getItem('willSaveReplayAutomatically');
+      storedValue === null ? true : storedValue === 'true';
   } catch (err) {
     console.log(err);
   }
@@ -870,7 +880,21 @@ export function setUpUI() {
 
   const exitBtn = document.getElementById('exit-btn');
   exitBtn.addEventListener('click', () => {
+    console.log('나는 더미2');
     location.reload();
+  });
+
+  const spectatorBtn = document.getElementById('show-list-for-spectator');
+  const spectatorBox = document.getElementById('spectator-room-list-box');
+  spectatorBtn.addEventListener('click', () => {
+    console.log('나는 더미1');
+    spectatorBox.classList.remove('hidden');
+    fetchSpectatorRoomList();
+  });
+
+  const cancelSpectateBtn = document.getElementById('cancel-spectate-btn');
+  cancelSpectateBtn.addEventListener('click', () => {
+    window.location.reload();
   });
 }
 
@@ -884,6 +908,9 @@ export function setUpUIAfterLoadingGameAssets(pikaVolley, ticker) {
   applyOptions = (options) => {
     setSelectedOptionsBtn(options);
     replaySaver.recordOptions(options);
+    if (channel.amICreatedRoom) {
+      InputSaverForSpectator.recordOptions(options);
+    }
     if (options.graphic) {
       switch (options.graphic) {
         case 'sharp':
@@ -964,6 +991,22 @@ export function setUpUIAfterLoadingGameAssets(pikaVolley, ticker) {
           break;
         case 15:
           pikaVolley.winningScore = 15;
+          break;
+      }
+    }
+    if (options.rule) {
+      switch (options.rule) {
+        case 'Pgo':
+          pikaVolley.physics.modeNum = 1;
+          pikaVolley.changeDownBoardVisibility(true);
+          break;
+        case 'noserve':
+          pikaVolley.physics.modeNum = 2;
+          pikaVolley.changeDownBoardVisibility(false);
+          break;
+        case 'DL36':
+          pikaVolley.physics.modeNum = 3;
+          pikaVolley.changeDownBoardVisibility(true);
           break;
       }
     }
@@ -1223,6 +1266,29 @@ function askOptionsChangeSendToPeer(options) {
           .trim();
         break;
     }
+  } else if (options.rule) {
+    optionsChangeBox.textContent =
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
+    switch (options.rule) {
+      case 'Pgo':
+        optionsChangeBox.textContent += document
+          .getElementById('Pgo-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'noserve':
+        optionsChangeBox.textContent += document
+          .getElementById('noserve-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'DL36':
+        optionsChangeBox.textContent += document
+          .getElementById('Down-Limit-36-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+    }
   } else {
     return;
   }
@@ -1282,6 +1348,29 @@ export function askOptionsChangeReceivedFromPeer(options) {
       case 15:
         optionsChangeBox.textContent += document
           .getElementById('winning-score-15-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+    }
+  } else if (options.rule) {
+    optionsChangeBox.textContent =
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
+    switch (options.rule) {
+      case 'Pgo':
+        optionsChangeBox.textContent += document
+          .getElementById('Pgo-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'noserve':
+        optionsChangeBox.textContent += document
+          .getElementById('noserve-rule-btn')
+          .textContent.replace('\u2713', '')
+          .trim();
+        break;
+      case 'DL36':
+        optionsChangeBox.textContent += document
+          .getElementById('Down-Limit-36-rule-btn')
           .textContent.replace('\u2713', '')
           .trim();
         break;
@@ -1517,7 +1606,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'slow', winningScore: null });
+    askOptionsChangeSendToPeer({
+      speed: 'slow',
+      winningScore: null,
+      rule: null,
+    });
   });
   mediumSpeedBtn.addEventListener('click', () => {
     if (mediumSpeedBtn.classList.contains('selected')) {
@@ -1528,7 +1621,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'medium', winningScore: null });
+    askOptionsChangeSendToPeer({
+      speed: 'medium',
+      winningScore: null,
+      rule: null,
+    });
   });
   fastSpeedBtn.addEventListener('click', () => {
     if (fastSpeedBtn.classList.contains('selected')) {
@@ -1539,7 +1636,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'fast', winningScore: null });
+    askOptionsChangeSendToPeer({
+      speed: 'fast',
+      winningScore: null,
+      rule: null,
+    });
   });
   noticeBoxGameInProgressForSpeedOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForSpeed.classList.contains('hidden')) {
@@ -1570,7 +1671,7 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: 5 });
+    askOptionsChangeSendToPeer({ speed: null, winningScore: 5, rule: null });
   });
   winningScore10Btn.addEventListener('click', () => {
     if (winningScore10Btn.classList.contains('selected')) {
@@ -1581,7 +1682,7 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: 10 });
+    askOptionsChangeSendToPeer({ speed: null, winningScore: 10, rule: null });
   });
   winningScore15Btn.addEventListener('click', () => {
     if (winningScore15Btn.classList.contains('selected')) {
@@ -1592,11 +1693,72 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: 15 });
+    askOptionsChangeSendToPeer({ speed: null, winningScore: 15, rule: null });
   });
   noticeBoxGameInProgressForWinningScoreOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForWinningScore.classList.contains('hidden')) {
       noticeBoxGameInProgressForWinningScore.classList.add('hidden');
+      enableOptionsBtn();
+    }
+  });
+
+  const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
+  const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+  const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
+  const noticeBoxGameInProgressForRule = document.getElementById(
+    'notice-rule-options-cannot-changed-if-game-in-progress'
+  );
+  const noticeBoxGameInProgressForRuleOKBtn = document.getElementById(
+    'notice-rule-options-cannot-changed-if-game-in-progress-ok-btn'
+  );
+  PgoRuleBtn.addEventListener('click', () => {
+    if (PgoRuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'Pgo',
+    });
+  });
+  noserveRuleBtn.addEventListener('click', () => {
+    if (noserveRuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'noserve',
+    });
+  });
+  DL36RuleBtn.addEventListener('click', () => {
+    if (DL36RuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'DL36',
+    });
+  });
+  noticeBoxGameInProgressForRuleOKBtn.addEventListener('click', () => {
+    if (!noticeBoxGameInProgressForRule.classList.contains('hidden')) {
+      noticeBoxGameInProgressForRule.classList.add('hidden');
       enableOptionsBtn();
     }
   });
@@ -1648,6 +1810,11 @@ function setUpToShowDropdownsAndSubmenus() {
     .addEventListener('mouseover', () => {
       showSubmenu('winning-score-submenu-btn', 'winning-score-submenu');
     });
+  document
+    .getElementById('rule-submenu-btn')
+    .addEventListener('mouseover', () => {
+      showSubmenu('rule-submenu-btn', 'rule-submenu');
+    });
 
   // set up to show submenus on click event
   // (it is for touch device equipped with physical keyboard)
@@ -1665,11 +1832,14 @@ function setUpToShowDropdownsAndSubmenus() {
     .addEventListener('click', () => {
       showSubmenu('winning-score-submenu-btn', 'winning-score-submenu');
     });
+  document.getElementById('rule-submenu-btn').addEventListener('click', () => {
+    showSubmenu('rule-submenu-btn', 'rule-submenu');
+  });
 }
 
 /**
  * Set selected (checked) options btn fit to options
- * @param {{graphic: string, bgm: string, sfx: string, speed: string, winningScore: number}} options
+ * @param {{graphic: string, bgm: string, sfx: string, speed: string, winningScore: number, rule: string}} options
  */
 function setSelectedOptionsBtn(options) {
   if (options.graphic) {
@@ -1766,7 +1936,31 @@ function setSelectedOptionsBtn(options) {
         break;
     }
   }
+  if (options.rule) {
+    const PgoRuleBtn = document.getElementById('Pgo-rule-btn');
+    const noserveRuleBtn = document.getElementById('noserve-rule-btn');
+    const DL36RuleBtn = document.getElementById('Down-Limit-36-rule-btn');
+    switch (options.rule) {
+      case 'Pgo':
+        PgoRuleBtn.classList.add('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.remove('selected');
+        break;
+      case 'noserve':
+        PgoRuleBtn.classList.remove('selected');
+        noserveRuleBtn.classList.add('selected');
+        DL36RuleBtn.classList.remove('selected');
+        break;
+      case 'DL36':
+        PgoRuleBtn.classList.remove('selected');
+        noserveRuleBtn.classList.remove('selected');
+        DL36RuleBtn.classList.add('selected');
+        break;
+    }
+  }
 }
+
+let spectatorFetchInterval = null; // To refresh the room search
 
 /**
  * Attach event listeners to ask and notice boxes relevant to changing options
@@ -1877,4 +2071,95 @@ function hideSubmenus() {
   for (let i = 0; i < submenuBtns.length; i++) {
     submenuBtns[i].classList.remove('open');
   }
+}
+
+/**
+ * Bring list of room by calling /rooms on server
+ */
+async function fetchSpectatorRoomList() {
+  const contentDiv = document.getElementById('spectator-room-list-content');
+  const loadingDiv = document.getElementById('Loading-room-list');
+  const noRoomDiv = document.getElementById('No-room-list');
+  const existingTable = document.getElementById('spectator-room-list-table');
+
+  if (!contentDiv || !loadingDiv || !noRoomDiv) {
+    return;
+  }
+  loadingDiv.classList.remove('hidden');
+  noRoomDiv.classList.add('hidden');
+  if (existingTable) {
+    existingTable.remove();
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/rooms`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    if (data.rooms && data.rooms.length > 0) {
+      loadingDiv.classList.add('hidden');
+      noRoomDiv.classList.add('hidden');
+      buildRoomTable(contentDiv, data.rooms);
+    } else {
+      loadingDiv.classList.add('hidden');
+      noRoomDiv.classList.remove('hidden');
+      console.log("There isn't available room. Searching again after 2 sec.");
+      spectatorFetchInterval = setTimeout(fetchSpectatorRoomList, 2000); // Searching again at 2 sec period
+    }
+  } catch (e) {
+    console.error('Failed for loading list or rooms:', e);
+    noRoomDiv.classList.add('hidden');
+    spectatorFetchInterval = setTimeout(fetchSpectatorRoomList, 2000); // Searching again at 2 sec period
+  }
+}
+
+/**
+ * Construct html with data from server
+ * @param {HTMLElement} contentDiv
+ * @param {Array<{id: string, nicknames: string[], ips: string[]}>} rooms
+ */
+function buildRoomTable(contentDiv, rooms) {
+  const table = document.createElement('table');
+  table.id = 'spectator-room-list-table';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th>Player 1</th>
+      <th>Player 2</th>
+    </tr>
+  `;
+
+  const tbody = document.createElement('tbody');
+
+  rooms.forEach((room) => {
+    const tr = document.createElement('tr');
+    tr.className = 'spectator-room-row';
+    tr.dataset.roomId = room.id;
+
+    const p1Nick = room.nicknames[0] || 'Player 1';
+    const p2Nick = room.nicknames[1] || 'Player 2';
+    const p1IP = room.ips[0] || '*.*';
+    const p2IP = room.ips[1] || '*.*';
+
+    tr.innerHTML = `
+      <td>${p1Nick}(${p1IP})</td>
+      <td>${p2Nick}(${p2IP})</td>
+    `;
+
+    tr.addEventListener('click', () => {
+      // Move to spectator/index.html
+      window.location.href = `spectator/index.html?room=${room.id}`;
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+
+  contentDiv.innerHTML = '';
+  contentDiv.appendChild(table);
 }

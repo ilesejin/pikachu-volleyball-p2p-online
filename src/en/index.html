@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pikachu Volleyball P2P Online</title>
+    <title>Pikachu Volleyball P2P Online for Competitions</title>
     <meta
       name="description"
       content="Play the game Pikachu Volleyball online via P2P (peer-to-peer) connection"
@@ -77,6 +77,12 @@
           <span class="no-wrap"
             ><a href="https://gorisanson.github.io/">Kyutae Lee</a></span
           >
+        </p>
+        <p class="modified-by">
+          <span class="no-wrap">This is pikachu-volleyball-p2p-online for Competitions helds at <a href="https://open.kakao.com/o/g0Cs478f">pikachu-volleyball online</a> <br />
+            The web version has been modified to conform to tournament rules. <br />
+            Modified by:
+          <span class="no-wrap"><a href="https://github.com/ilesejin">Exabyte</a></span>
         </p>
         <p class="source-code-on">
           You can view the source code on
@@ -199,6 +205,14 @@
               is recommended to turn it off.)</label
             >
           </div>
+          <div class="margin-top-a-little">
+            <input id="basic-chat-filter-checkbox" type="checkbox" checked="checked"/>
+            <label for="basic-chat-filter-checkbox"
+              >Use the default profanity filter (pre-defined banned words will be censored
+               in chat with your partner. Additional banned words can be added under the 
+               Quick Match block list.)</label
+            >
+          </div>
         </div>
         <div>
           <p class="margin-top">
@@ -304,6 +318,7 @@
         <button type="button" id="with-your-friend-btn">
           With one of your friends
         </button>
+        <button type="button" id="show-list-for-spectator">watching other's</button>
       </div>
       <div id="blocked-ip-addresses-table-container" class="margin-top">
         <details>
@@ -324,6 +339,47 @@
             <tfoot>
               <tr>
                 <td colspan="3">
+                  <button type="button" class="delete-btn">
+                    Delete from the list
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </details>
+      </div>
+      <div id="blocked-bad-words-table-container" class="margin-top">
+        <details>
+          <summary>
+            List of additional Banned words (<span id="number-of-bad-words-addresses">0</span>/50)
+          </summary>
+          <table class="blocked-bad-words-table">
+            <thead>
+              <tr>
+                <th>Banned word content</th>
+                <th>Creation date</th>
+              </tr>
+            </thead>
+            <tbody>
+              </tbody>
+            <tfoot>
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    id="new-custom-word-input"
+                    placeholder="Banned words to add"
+                    style="width: 95%;"
+                  />
+                </td>
+                <td>
+                  <button type="button" id="add-custom-word-btn" style="width: 100%;">
+                    Registration
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
                   <button type="button" class="delete-btn">
                     Delete from the list
                   </button>
@@ -663,6 +719,27 @@
         </button>
       </div>
     </div>
+    <div
+      id="spectator-room-list-box"
+      class="fade-in-box notice fixed hidden"
+    >
+      <p class="thick">List of players at now</p>
+      <div id="spectator-room-list-content">
+        <div id="Loading-room-list">
+          <p>Searching for the rooms...</p>
+        </div>
+        <div id="No-room-list" class="hidden">
+          <p>There are no rooms available here right now.</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="cancel-spectate-btn"
+        class="btn-in-box large"
+      >
+        <span class="no-wrap">Exit</span>
+      </button>
+    </div>
     <div id="flex-container" class="hidden">
       <div id="menu-bar">
         <div class="btn-container left">
@@ -781,6 +858,26 @@
                   </button>
                 </div>
               </div>
+              <div class="relative-container">
+                <button
+                  type="button"
+                  id="rule-submenu-btn"
+                  class="btn submenu-btn"
+                >
+                  Rules &#9654;&#xfe0e;
+                </button>
+                <div id="rule-submenu" class="submenu">
+                  <button type="button" id="Pgo-rule-btn" class="btn selected">
+                    <span class="check">&check; </span>Pgo rule
+                  </button>
+                  <button type="button" id="noserve-rule-btn" class="btn">
+                    <span class="check">&check; </span>No-serve rule
+                  </button>
+                  <button type="button" id="Down-Limit-36-rule-btn" class="btn">
+                    <span class="check">&check; </span>DL 3·6 rule
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="relative-container">
@@ -832,6 +929,11 @@
           <div class="nickname-and-partial-ip left">
             <span id="player1-nickname" class="nickname"></span>
             <span id="player1-partial-ip" class="partial-ip"></span>
+            <span
+              id="player1-hiding-peer-nickname"
+              class="hiding-peer-nickname hidden"
+              >not seeing peer's nickname</span
+            >
             <span id="player1-chat-disabled" class="chat-disabled hidden"
               >chat disabled</span
             >
@@ -839,6 +941,11 @@
           <div class="nickname-and-partial-ip right">
             <span id="player2-nickname" class="nickname"></span>
             <span id="player2-partial-ip" class="partial-ip"></span>
+            <span
+              id="player2-hiding-peer-nickname"
+              class="hiding-peer-nickname hidden"
+              >not seeing peer's nickname</span
+            >
             <span id="player2-chat-disabled" class="chat-disabled hidden"
               >chat disabled</span
             >
@@ -990,6 +1097,21 @@
             OK (Y)
           </button>
         </div>
+        <div
+          class="fade-in-box notice hidden"
+          id="notice-rule-options-cannot-changed-if-game-in-progress"
+        >
+          <p>
+            Rule settings cannot be changed while a match is in progress. Please try again after the current match ends.
+          </p>
+          <button
+            type="button"
+            id="notice-rule-options-cannot-changed-if-game-in-progress-ok-btn"
+            class="btn-in-box key-y"
+          >
+            OK (Y)
+          </button>
+        </div>
         <div class="fade-in-box notice hidden" id="ask-one-more-game">
           <p>Play one more game with the peer?</p>
           <div class="grid-1-1 center">
@@ -1093,6 +1215,9 @@
           <button type="button" id="chat-disabling-btn">Disable chat</button>
           <div id="text-disable-chat" class="hidden">Disable chat</div>
           <div id="text-enable-chat" class="hidden">Enable chat</div>
+          <button type="button" id="nickname-hide-btn">Hide nickname</button>
+          <div id="text-hide-nickname" class="hidden">Hide nickname</div>
+          <div id="text-show-nickname" class="hidden">Show nickname</div>
         </div>
       </div>
     </div>

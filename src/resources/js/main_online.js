@@ -56,7 +56,10 @@ import { ASSETS_PATH } from './offline_version_js/assets_path.js';
 import { channel } from './data_channel/data_channel.js';
 import { setUpUI, setUpUIAfterLoadingGameAssets } from './ui_online.js';
 import { setUpUIForBlockingOtherUsers } from './block_other_players/ui.js';
+import { setUpUIForManagingBadWords } from './bad_words_censorship/ui.js';
 import { setGetSpeechBubbleNeeded } from './chat_display.js';
+import { relayChannel } from './spectate/relay_channel.js';
+import { replaySaver } from './replay/replay_saver.js';
 import '../style.css';
 
 // To show two "with friend" on the menu
@@ -103,12 +106,63 @@ for (const prop in ASSETS_PATH.SOUNDS) {
   loader.add(ASSETS_PATH.SOUNDS[prop]);
 }
 setUpLoaderProgressBar();
+console.log('Entering PLAYER/BROADCASTER mode.');
+
 channel.callbackAfterDataChannelOpened = () => {
-  loader.load(setup);
+  console.log('P2P data channel opened. Now connecting to relay server...');
+
+  const playerRoomId = replaySaver.roomID;
+
+  if (!playerRoomId) {
+    console.error(
+      'Cannot broadcast: Room ID is not available from P2P channel.'
+    );
+    loader.load(setup);
+    return;
+  }
+
+  relayChannel.connect(playerRoomId, () => {
+    console.log('Relay server connected for BROADCASTING.');
+    if (channel.amICreatedRoom) {
+      relayChannel.send({
+        type: 'identify_player',
+        nicknames: [channel.myNickname, channel.peerNickname],
+        partialPublicIPs: [
+          channel.myPartialPublicIP,
+          channel.peerPartialPublicIP,
+        ],
+      });
+    } else {
+      relayChannel.send({
+        type: 'identify_player',
+        nicknames: [channel.peerNickname, channel.myNickname],
+        partialPublicIPs: [
+          channel.peerPartialPublicIP,
+          channel.myPartialPublicIP,
+        ],
+      });
+    }
+
+    console.log("Sent 'identify_player' to server.");
+    const SERVER_URL = 'wss://pikavolley-relay-server.onrender.com';
+    const testSocket = new WebSocket(`${SERVER_URL}/${playerRoomId}`);
+
+    testSocket.onopen = () => {
+      console.log('[TEST] Test spectator socket connected.');
+      testSocket.send(JSON.stringify({ type: 'watch' }));
+    };
+
+    testSocket.onerror = (err) => {
+      console.error('[TEST] Test spectator socket error:', err);
+    };
+
+    loader.load(setup);
+  });
 };
 
 setUpUI();
 setUpUIForBlockingOtherUsers();
+setUpUIForManagingBadWords();
 
 /**
  * Set up the loader progress bar.
