@@ -497,7 +497,7 @@ button.btn-in-box {
   border-radius: 10px;
 }
 button.btn-in-box.key-y,
-button.btn-in-box.key-n  {
+button.btn-in-box.key-n {
   width: calc(8 * var(--font-size));
 }
 button.large {
@@ -998,4 +998,4 @@ input.toggle-switch:checked + label::before {
 }
 
 
-/*# sourceMappingURL=341.bf28a9daa5bdb35e00e0.css.map*/
+/*# sourceMappingURL=341.fd5a43453f5aa5384327.css.map*/
