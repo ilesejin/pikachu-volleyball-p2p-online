@@ -279,6 +279,10 @@ export class PikachuVolleyballReplay extends PikachuVolleyball {
             this.physics.modeNum = 2;
             this.changeDownBoardVisibility(false);
             break;
+          case 'DL36':
+            this.physics.modeNum = 3;
+            this.changeDownBoardVisibility(true);
+            break;
         }
       }
       this.optionsCounter++;

@@ -248,8 +248,11 @@ export function setUpUI() {
     'auto-save-replay-checkbox'
   );
   try {
-    const storedValue = window.localStorage.getItem('willSaveReplayAutomatically');
-    willSaveReplayAutomatically = storedValue === null ? true : storedValue === 'true';
+    const storedValue = window.localStorage.getItem(
+      'willSaveReplayAutomatically'
+    );
+    willSaveReplayAutomatically =
+      storedValue === null ? true : storedValue === 'true';
   } catch (err) {
     console.log(err);
   }
@@ -1245,8 +1248,7 @@ function askOptionsChangeSendToPeer(options) {
     }
   } else if (options.rule) {
     optionsChangeBox.textContent =
-      document.getElementById('rule-submenu-btn').textContent.trim() +
-      ' ';
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
     switch (options.rule) {
       case 'Pgo':
         optionsChangeBox.textContent += document
@@ -1332,8 +1334,7 @@ export function askOptionsChangeReceivedFromPeer(options) {
     }
   } else if (options.rule) {
     optionsChangeBox.textContent =
-      document.getElementById('rule-submenu-btn').textContent.trim() +
-      ' ';
+      document.getElementById('rule-submenu-btn').textContent.trim() + ' ';
     switch (options.rule) {
       case 'Pgo':
         optionsChangeBox.textContent += document
@@ -1585,7 +1586,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'slow', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'slow',
+      winningScore: null,
+      rule: null,
+    });
   });
   mediumSpeedBtn.addEventListener('click', () => {
     if (mediumSpeedBtn.classList.contains('selected')) {
@@ -1596,7 +1601,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'medium', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'medium',
+      winningScore: null,
+      rule: null,
+    });
   });
   fastSpeedBtn.addEventListener('click', () => {
     if (fastSpeedBtn.classList.contains('selected')) {
@@ -1607,7 +1616,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: 'fast', winningScore: null, rule: null });
+    askOptionsChangeSendToPeer({
+      speed: 'fast',
+      winningScore: null,
+      rule: null,
+    });
   });
   noticeBoxGameInProgressForSpeedOKBtn.addEventListener('click', () => {
     if (!noticeBoxGameInProgressForSpeed.classList.contains('hidden')) {
@@ -1687,7 +1700,11 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'Pgo' });
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'Pgo',
+    });
   });
   noserveRuleBtn.addEventListener('click', () => {
     if (noserveRuleBtn.classList.contains('selected')) {
@@ -1698,7 +1715,26 @@ function setUpOptionsBtn() {
       disableOptionsBtn();
       return;
     }
-    askOptionsChangeSendToPeer({ speed: null, winningScore: null, rule: 'noserve' });
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'noserve',
+    });
+  });
+  DL36RuleBtn.addEventListener('click', () => {
+    if (DL36RuleBtn.classList.contains('selected')) {
+      return;
+    }
+    if (isGameInProgress()) {
+      noticeBoxGameInProgressForRule.classList.remove('hidden');
+      disableOptionsBtn();
+      return;
+    }
+    askOptionsChangeSendToPeer({
+      speed: null,
+      winningScore: null,
+      rule: 'DL36',
+    });
   });
   DL36RuleBtn.addEventListener('click', () => {
     if (DL36RuleBtn.classList.contains('selected')) {
