@@ -681,6 +681,8 @@ function processPlayerMovementAndSetPlayerPosition(
       (player.isPlayer2 && ball.dribbleCounts[1] > 2))
   ) {
     ball.canPowerhitBasedOnCollision = false;
+  } else if (modeNum == 3) {
+    ball.canPowerhitBasedOnCollision = true;
   }
 
   if (userInput.powerHit === 1) {
